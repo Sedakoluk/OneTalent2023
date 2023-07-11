@@ -23,6 +23,18 @@ SELECTION-SCREEN END OF BLOCK b2.
 
 START-OF-SELECTION.
 
+  IF rb4 = 'X' AND p_sayi2 = 0.
+    MESSAGE 'Sıfıra Bölme İşlemi Yapılamaz!' TYPE 'E'.
+    EXIT.
+  ENDIF.
+
+*      p_sayi2 = 0.
+*  TRY.
+*      gv_sonuc = p_sayi1 / p_sayi2.
+*    CATCH cx_sy_zerodivide.
+*      cl_demo_output=>write( |Sıfıra Bölme İşlemi Yapılamaz!| ).
+*  ENDTRY.
+
   DATA: gv_sayi1 TYPE i,
         gv_sayi2 TYPE i,
         gv_sonuc TYPE p DECIMALS 2.
@@ -43,13 +55,6 @@ START-OF-SELECTION.
     gv_sonuc = gv_sayi1 / gv_sayi2.
 
   ENDIF.
-
-p_sayi2 = 0.
-try.
-gv_sonuc = p_sayi1 / p_sayi2.
-CATCH cx_sy_zerodivide.
-cl_demo_output=>write( |Sıfıra Bölme İşlemi Yapılamaz!| ).
-ENDTRY.
 
   cl_demo_output=>write( gv_sonuc ).
   cl_demo_output=>display(  ).
