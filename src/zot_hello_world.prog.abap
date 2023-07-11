@@ -6,3 +6,7 @@
 REPORT zot_hello_world.
 
 WRITE 'Hello World'.
+
+cl_demo_output=>write( 'Merhaba' ).
+
+cl_demo_output=>display(  ).
