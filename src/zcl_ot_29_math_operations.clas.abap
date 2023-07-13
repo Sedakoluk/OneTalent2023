@@ -17,7 +17,8 @@ ENDCLASS.
 
 
 
-CLASS zcl_ot_29_math_operations IMPLEMENTATION.
+CLASS ZCL_OT_29_MATH_OPERATIONS IMPLEMENTATION.
+
 
   METHOD hesapla. "oluşturulan methodu çağırdık.
 
@@ -29,9 +30,9 @@ CLASS zcl_ot_29_math_operations IMPLEMENTATION.
       WHEN '*'.
         ev_sonuc = iv_sayi1 * iv_sayi2.
       WHEN '/'.
+
         ev_sonuc = iv_sayi1 / iv_sayi2.
     ENDCASE.
 
   ENDMETHOD.
-
 ENDCLASS.
