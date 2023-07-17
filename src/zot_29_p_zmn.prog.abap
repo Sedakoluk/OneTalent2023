@@ -58,8 +58,8 @@ START-OF-SELECTION.
 
 
     SELECT * INTO TABLE lt_zaman
-      FROM zot_19_t_zmn
-      WHERE id IN s_index.
+      FROM zot_29_t_zmn
+      WHERE indx IN s_index.
 
     LOOP AT lt_zaman INTO ls_zaman.
       WRITE /.
