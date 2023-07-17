@@ -52,8 +52,8 @@ START-OF-SELECTION.
 
     IF sy-subrc = 0.
       cl_demo_output=>display( t_zaman ).
-    ELSE.
-      MESSAGE 'İndex''e Ait Kayıt bulunamadı!' TYPE 'I'.
+*    ELSE.
+*      MESSAGE 'İndex''e Ait Kayıt bulunamadı!' TYPE 'I'.
     ENDIF.
 
 
@@ -64,13 +64,6 @@ START-OF-SELECTION.
     LOOP AT lt_zaman INTO ls_zaman.
       WRITE /.
 
-      PERFORM zaman USING
-                           ls_zaman-indx
-                           ls_zaman-bas_saat
-                           ls_zaman-bas_tarih
-                           ls_zaman-bit_saat
-                           ls_zaman-bit_tarih.
-    ENDLOOP.
 
 " MOD: bölme işlemi sonucunun kalan değerini
 " DIV: bölüm değerinin tam sayı kısmını
@@ -84,10 +77,7 @@ START-OF-SELECTION.
   lv_ay     = lv_gun DIV 30.
   lv_gun    = lv_gun MOD 30.
 
-FORM zaman USING
-                 indx
-                 bas_saat
-                 bas_tarih
-                 bit_saat
-                 bit_tarih.
-ENDFORM.
+  ENDLOOP.
+
+  cl_demo_output=>write( | { lv_gun } gün  { lv_saat } saat { lv_dakika } dakika { lv_saniye } saniye fark vardır.  | ).
+  cl_demo_output=>display(  ).
