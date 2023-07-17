@@ -79,5 +79,6 @@ START-OF-SELECTION.
 
   ENDLOOP.
 
+
   cl_demo_output=>write( | { lv_gun } gün  { lv_saat } saat { lv_dakika } dakika { lv_saniye } saniye fark vardır.  | ).
   cl_demo_output=>display(  ).
