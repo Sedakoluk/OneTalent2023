@@ -5,7 +5,14 @@
 *&---------------------------------------------------------------------*
 REPORT zot_29_p_deneme_report.
 
-INCLUDE zot_29_deneme_include_top.
-INCLUDE zot_29_deneme_include_slc.
+tables:  eban.
 
-INITIALIZATION.
+DATA: gs_eban TYPE eban,
+      gt_eban TYPE TABLE OF eban.
+
+SELECTION-SCREEN begin of BLOCK b1 WITH FRAME TITLE text-001.
+
+  SELECT-OPTIONS: s_satno FOR gs_eban-banfn,
+                  s_bturu FOR gs_eban-bnfpo.
+
+SELECTION-SCREEN END OF BLOCK b1.

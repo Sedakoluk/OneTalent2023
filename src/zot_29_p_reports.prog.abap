@@ -16,12 +16,12 @@ INITIALIZATION.
 START-OF-SELECTION.
 
 IF  p_sat = 'X'.
-  LOOP AT SCREEN.
-    IF screen-group1 EQ 'X'.
-      screen-active = 0.
-    ELSE.
-      screen-active = 1.
-    ENDIF.
+*  LOOP AT SCREEN.
+*    IF screen-group1 EQ 'X'.
+*      screen-active = 0.
+*    ELSE.
+*      screen-active = 1.
+*    ENDIF.
 
     SELECT a~banfn,
            a~bnfpo,
@@ -33,15 +33,15 @@ FROM eban AS a
 INNER JOIN ekpo AS b ON a~matkl = b~matkl
 INTO TABLE @DATA(lt_eban) WHERE a~banfn IN @s_satno AND a~matkl IN @s_bturu.
 
-  ENDLOOP.
+*  ENDLOOP.
 
 ELSEIF p_sas = 'X'.
-  LOOP AT SCREEN.
-    IF screen-group1 EQ 'X'.
-      screen-active = 0.
-    ELSE.
-      screen-active = 1.
-    ENDIF.
+*  LOOP AT SCREEN.
+*    IF screen-group1 EQ 'X'.
+*      screen-active = 0.
+*    ELSE.
+*      screen-active = 1.
+*    ENDIF.
 
     SELECT a~ebeln,
            a~ebelp,
@@ -50,11 +50,12 @@ ELSEIF p_sas = 'X'.
            a~menge,
            a~meins
     FROM ekpo AS a
-    INNER JOIN eban AS b ON a~matkl = b~matkl
-    INNER JOIN ekko AS c ON a~ebeln = c~ebeln
-    INTO TABLE @DATA(lt_ekpo) WHERE c~ebeln IN @s_sasno AND a~matkl IN @s_malg.
+    INNER JOIN eban AS b ON a~banfn = b~banfn AND
+                            a~bnfpo = b~bnfpo
+*    INNER JOIN ekko AS c ON a~ebeln = c~ebeln
+    INTO TABLE @DATA(lt_ekpo) WHERE a~ebeln IN @s_sasno AND a~matkl IN @s_malg.
 
-  ENDLOOP.
+*  ENDLOOP.
 ENDIF.
 
 go_main->display_grid( ).
