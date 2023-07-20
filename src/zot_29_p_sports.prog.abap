@@ -109,7 +109,7 @@ gt_sports = VALUE #( BASE gt_sports ( id = 1
 
 
 DATA(lv_count)  = 16.
-
+do lines( gt_sports ) times.
 LOOP AT gt_sports INTO DATA(ls_db).
 
     CALL FUNCTION 'QF05_RANDOM_INTEGER'
@@ -135,8 +135,9 @@ LOOP AT gt_sports INTO DATA(ls_db).
     ENDIF.
   ENDIF.
 ENDLOOP.
+ENDDO.
 
-
+do lines( gt_sports ) times.
 LOOP AT gt_sports INTO DATA(ls_db2).
 
     CALL FUNCTION 'QF05_RANDOM_INTEGER'
@@ -163,8 +164,9 @@ LOOP AT gt_sports INTO DATA(ls_db2).
   ENDIF.
   endif.
 ENDLOOP.
+ENDDO.
 
-
+do lines( gt_sports ) times.
 LOOP AT gt_sports INTO DATA(ls_db3).
 
     CALL FUNCTION 'QF05_RANDOM_INTEGER'
@@ -191,34 +193,44 @@ LOOP AT gt_sports INTO DATA(ls_db3).
   ENDIF.
   endif.
 ENDLOOP.
+ENDDO.
 
-LOOP AT gt_sports INTO DATA(ls_db4).
+*cl_demo_output=>write( gt_sports ).
 
-    CALL FUNCTION 'QF05_RANDOM_INTEGER'
-    EXPORTING
-      ran_int_max   = lv_count - 1
-      ran_int_min   = 1
-    IMPORTING
-      ran_int       = gv_random
-    EXCEPTIONS
-      invalid_input = 1
-      OTHERS        = 2.
+*LOOP AT gt_sports INTO DATA(ls_db4).
+*
+*    CALL FUNCTION 'QF05_RANDOM_INTEGER'
+*    EXPORTING
+*      ran_int_max   = lv_count - 1
+*      ran_int_min   = 1
+*    IMPORTING
+*      ran_int       = gv_random
+*    EXCEPTIONS
+*      invalid_input = 1
+*      OTHERS        = 2.
+*
+*  READ TABLE gt_sports INTO DATA(ls_read4) WITH KEY id = gv_random.
+*  IF sy-subrc = 0.
+*    if sy-index MOD 4 = 0.
+*    IF ls_read4-ulke_adi NE ls_db4-ulke_adi.
+*      IF ls_read4-torba NE ls_db4-torba.
+*        if lines( gt_dgrup ) < 4.
+*        APPEND ls_read4-takim_adi TO gt_dgrup.
+*        DELETE gt_sports WHERE id  = ls_read4-id.
+*       endif.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+*  endif.
+*ENDLOOP.
 
-  READ TABLE gt_sports INTO DATA(ls_read4) WITH KEY id = gv_random.
-  IF sy-subrc = 0.
-    if sy-index MOD 4 = 0.
-    IF ls_read4-ulke_adi NE ls_db4-ulke_adi.
-      IF ls_read4-torba NE ls_db4-torba.
-        if lines( gt_dgrup ) < 4.
-        APPEND ls_read4-takim_adi TO gt_dgrup.
-        DELETE gt_sports WHERE id  = ls_read4-id.
-       endif.
-      ENDIF.
-    ENDIF.
-  ENDIF.
-  endif.
+
+data: gt_term type table of gty_sports.
+      move gt_sports to gt_term.
+      loop at gt_term into data(ls_term).
+        APPEND ls_term-takim_adi TO gt_dgrup.
+        DELETE gt_sports WHERE id  = ls_term-id.
 ENDLOOP.
-
 
 cl_demo_output=>write( gt_agrup ).
 cl_demo_output=>write( gt_bgrup ).
