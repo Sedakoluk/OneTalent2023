@@ -3,19 +3,17 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>ZOT_29_DENEME_INCLUDE_CLASS</NAME>
-    <DBAPL>S</DBAPL>
-    <DBNA>D$</DBNA>
-    <SUBC>I</SUBC>
+    <NAME>ZOT_29_SALV</NAME>
+    <SUBC>1</SUBC>
+    <RLOAD>E</RLOAD>
     <FIXPT>X</FIXPT>
-    <LDBNAME>D$S</LDBNAME>
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
    <TPOOL>
     <item>
      <ID>R</ID>
-     <ENTRY>İnclude class tanımlama</ENTRY>
-     <LENGTH>23</LENGTH>
+     <ENTRY>salv</ENTRY>
+     <LENGTH>4</LENGTH>
     </item>
    </TPOOL>
   </asx:values>

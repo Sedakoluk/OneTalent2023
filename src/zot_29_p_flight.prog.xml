@@ -3,21 +3,24 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>ZOT_29_DENEME_INCLUDE_CLASS</NAME>
-    <DBAPL>S</DBAPL>
-    <DBNA>D$</DBNA>
-    <SUBC>I</SUBC>
+    <NAME>ZOT_29_P_FLIGHT</NAME>
+    <SUBC>1</SUBC>
+    <RLOAD>T</RLOAD>
     <FIXPT>X</FIXPT>
-    <LDBNAME>D$S</LDBNAME>
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
-   <TPOOL>
+   <I18N_TPOOL>
     <item>
-     <ID>R</ID>
-     <ENTRY>İnclude class tanımlama</ENTRY>
-     <LENGTH>23</LENGTH>
+     <LANGUAGE>T</LANGUAGE>
+     <TEXTPOOL>
+      <item>
+       <ID>R</ID>
+       <ENTRY>Adobe Form FLIGHT</ENTRY>
+       <LENGTH>17</LENGTH>
+      </item>
+     </TEXTPOOL>
     </item>
-   </TPOOL>
+   </I18N_TPOOL>
   </asx:values>
  </asx:abap>
 </abapGit>
