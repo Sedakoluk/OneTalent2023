@@ -28,6 +28,42 @@
      <ENTRY>Öğrendiklerimi Deneme Programım</ENTRY>
      <LENGTH>31</LENGTH>
     </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_SAYI1</KEY>
+     <ENTRY>Sayı 1</ENTRY>
+     <LENGTH>14</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_SAYI2</KEY>
+     <ENTRY>Sayı 2</ENTRY>
+     <LENGTH>14</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>RB1</KEY>
+     <ENTRY>Toplama</ENTRY>
+     <LENGTH>15</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>RB2</KEY>
+     <ENTRY>Çıkarma</ENTRY>
+     <LENGTH>15</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>RB3</KEY>
+     <ENTRY>Çarpma</ENTRY>
+     <LENGTH>14</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>RB4</KEY>
+     <ENTRY>Bölme</ENTRY>
+     <LENGTH>13</LENGTH>
+    </item>
    </TPOOL>
   </asx:values>
  </asx:abap>

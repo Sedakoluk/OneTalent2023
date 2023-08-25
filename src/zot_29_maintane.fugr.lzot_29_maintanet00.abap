@@ -1,6 +1,24 @@
 *---------------------------------------------------------------------*
 *    view related data declarations
 *---------------------------------------------------------------------*
+*...processing: ZOT_29_MV.......................................*
+TABLES: ZOT_29_MV, *ZOT_29_MV. "view work areas
+CONTROLS: TCTRL_ZOT_29_MV
+TYPE TABLEVIEW USING SCREEN '0009'.
+DATA: BEGIN OF STATUS_ZOT_29_MV. "state vector
+          INCLUDE STRUCTURE VIMSTATUS.
+DATA: END OF STATUS_ZOT_29_MV.
+* Table for entries selected to show on screen
+DATA: BEGIN OF ZOT_29_MV_EXTRACT OCCURS 0010.
+INCLUDE STRUCTURE ZOT_29_MV.
+          INCLUDE STRUCTURE VIMFLAGTAB.
+DATA: END OF ZOT_29_MV_EXTRACT.
+* Table for all entries loaded from database
+DATA: BEGIN OF ZOT_29_MV_TOTAL OCCURS 0010.
+INCLUDE STRUCTURE ZOT_29_MV.
+          INCLUDE STRUCTURE VIMFLAGTAB.
+DATA: END OF ZOT_29_MV_TOTAL.
+
 *...processing: ZOT_29_T_DENEME.................................*
 DATA:  BEGIN OF STATUS_ZOT_29_T_DENEME               .   "state vector
          INCLUDE STRUCTURE VIMSTATUS.
@@ -59,6 +77,8 @@ TABLES: *ZOT_29_T_P_MAST               .
 TABLES: *ZOT_29_T_TWITTER              .
 TABLES: *ZOT_29_T_ZMN                  .
 TABLES: ZOT_29_T_DENEME                .
+TABLES: ZOT_29_T_MV_AT                 .
+TABLES: ZOT_29_T_MV_IT                 .
 TABLES: ZOT_29_T_P_A_TNO               .
 TABLES: ZOT_29_T_P_EGTM                .
 TABLES: ZOT_29_T_P_ETUR                .
