@@ -1,78 +1,65 @@
 *&---------------------------------------------------------------------*
-*& Include          ZOT_29_I_ADOBEF_EXCELUP_CL
+*& Include          ZOT_29_I_ADOBEF_EXCELUP_TOP
 *&---------------------------------------------------------------------*
-CLASS lcl_main DEFINITION.
-  PUBLIC SECTION.
 
-    METHODS: display_alv,
-      get_data_alv,
-      set_fcat,
-      "start_of_selection,
-      set_layout.
+TABLES: likp, lips.
 
-ENDCLASS.
+CLASS lcl_main DEFINITION DEFERRED.
+DATA: go_class TYPE REF TO lcl_main.
 
-CLASS lcl_main IMPLEMENTATION.
+TYPES: BEGIN OF gty_alv,
+         kunnr     TYPE likp-kunnr,
+         vbeln     TYPE lips-vbeln,
+         posnr     TYPE lips-posnr,
+         pstyv     TYPE lips-pstyv,
+         ernam     TYPE lips-ernam,
+         wadat_ist TYPE likp-wadat_ist,
+         matnr     TYPE lips-matnr,
+         ntgew     TYPE lips-ntgew,
+         gewei     TYPE lips-gewei,
+         route     TYPE likp-route,
+       END OF gty_alv.
 
-  METHOD display_alv.
+DATA: gt_alv TYPE TABLE OF gty_alv,
+      gs_alv TYPE gty_alv.
 
-CREATE OBJECT go_alv
+DATA: gt_rowindex TYPE lvc_t_row,
+      gs_rowindex LIKE LINE OF gt_rowindex.
 
-      EXPORTING
-        i_parent = cl_gui_container=>screen0. "alv'yi fullscreen basmak için
+DATA: go_alv  TYPE REF TO cl_gui_alv_grid,
+      go_cont TYPE REF TO cl_gui_custom_container.
 
-    CALL METHOD go_alv->set_table_for_first_display
-      EXPORTING
-        is_layout       = gs_layout      " Layout
-      CHANGING
-        it_outtab       = gt_alv         " internal Table adı yazmam lazım
-        it_fieldcatalog = gt_fieldcatalog. " field katalog oluşturup internal table olarak buraya vereceğiz
+DATA: gt_fieldcatalog TYPE lvc_t_fcat, "fieldcatalog doldurmak için ona ait bir structure olması lazım
+      gs_fieldcatalog TYPE lvc_s_fcat.
 
-  ENDMETHOD.
+DATA gs_layout  TYPE lvc_s_layo. "layout için structure oluşturdum
 
+DATA: gv_rc TYPE i.
+DATA: gt_file_table TYPE filetable, "file yolu seçmek için
+      gs_file_table TYPE file_table.
 
-  METHOD get_data_alv.
+DATA: gs_params     TYPE sfpoutputparams.
+DATA: gv_result     TYPE sfpjoboutput.
+DATA: gv_funcname   TYPE funcname.
+DATA: gs_docparams  TYPE sfpdocparams.
+DATA: gs_formoutput TYPE fpformoutput.
 
-    SELECT lp~kunnr,
-           ls~vbeln,
-           ls~posnr,
-           ls~pstyv,
-           ls~ernam,
-           lp~wadat_ist,
-           ls~mandt,
-           ls~ntgew,
-           ls~gewei FROM likp AS lp INNER JOIN lips AS ls
-      ON lp~vbeln = ls~vbeln
-      INTO CORRESPONDING FIELDS OF TABLE @gt_alv.
+FIELD-SYMBOLS : <gt_data> TYPE STANDARD TABLE .
 
-  ENDMETHOD.
+TYPES: BEGIN OF gty_excelup,
+         kunnr     TYPE likp-kunnr,
+         vbeln     TYPE lips-vbeln,
+         posnr     TYPE lips-posnr,
+         pstyv     TYPE lips-pstyv,
+         ernam     TYPE lips-ernam,
+         wadat_ist TYPE likp-wadat_ist,
+         matnr     TYPE lips-matnr,
+         ntgew     TYPE lips-ntgew,
+         gewei     TYPE lips-gewei,
+       END OF gty_excelup.
 
-  METHOD set_fcat.
+DATA: gt_excelup TYPE TABLE OF gty_excelup,
+      gs_excelup TYPE gty_excelup.
 
-    CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
-      EXPORTING
-        i_structure_name       = 'GT_ALV' "structure name / table alabildiği için kullandığım tablonun adını yazdım
-*       I_INTERNAL_TABNAME     =  "internal table name
-      CHANGING
-        ct_fieldcat            = gt_fieldcatalog "fieldcatalog verilir.
-      EXCEPTIONS
-        inconsistent_interface = 1
-        program_error          = 2
-        OTHERS                 = 3.
-    IF sy-subrc <> 0.
-* Implement suitable error handling here
-    ENDIF.
-
-  ENDMETHOD.
-
-  METHOD set_layout.
-
-    CLEAR: gs_layout.
-    gs_layout-cwidth_opt = abap_true. "kolon optimizasyon
-*gs_layout-edit = abap_true. "tüm kolonlar düzenlenebilir halde
-*gs_layout-no_toolbar = abap_true. "toolbarı yok eden
-    gs_layout-zebra = abap_true. "bir kotu renk bir açık renk - ounabilir olması için
-
-  ENDMETHOD.
-
-ENDCLASS.
+DATA: gt_excellog TYPE TABLE OF zot_29_t_eu,
+      gs_excellog TYPE zot_29_t_eu.

@@ -443,24 +443,345 @@ REPORT zot_29_p_deneme.
 *  ENDIF.
 
 
-PARAMETERS: a1 RADIOBUTTON GROUP a DEFAULT 'X' USER-COMMAND rg1,
-            a2 RADIOBUTTON GROUP a.
-PARAMETERS: box1(10)        DEFAULT 'India' MODIF ID rg1,
-            box2(10)        MODIF ID rg2.
+*PARAMETERS: a1 RADIOBUTTON GROUP a DEFAULT 'X' USER-COMMAND rg1,
+*            a2 RADIOBUTTON GROUP a.
+*PARAMETERS: box1(10)        DEFAULT 'India' MODIF ID rg1,
+*            box2(10)        MODIF ID rg2.
+*
+*AT SELECTION-SCREEN OUTPUT.
+*
+*  LOOP AT SCREEN.
+*    IF screen-group1 = 'RG1'.
+*      IF a2 = 'X'.
+*        screen-active = 0.
+*        MODIFY SCREEN.
+*      ENDIF.
+*    ENDIF.
+*    IF screen-group1 = 'RG2'.
+*      IF a1 = 'X'.
+*        screen-active = 0.
+*        MODIFY SCREEN.
+*      ENDIF.
+*    ENDIF.
+*  ENDLOOP.
 
-AT SELECTION-SCREEN OUTPUT.
 
-  LOOP AT SCREEN.
-    IF screen-group1 = 'RG1'.
-      IF a2 = 'X'.
-        screen-active = 0.
-        MODIFY SCREEN.
-      ENDIF.
-    ENDIF.
-    IF screen-group1 = 'RG2'.
-      IF a1 = 'X'.
-        screen-active = 0.
-        MODIFY SCREEN.
-      ENDIF.
-    ENDIF.
-  ENDLOOP.
+*TABLES sscrfields.
+*
+*DATA flag(1) TYPE c.
+*
+*SELECTION-SCREEN:
+*  BEGIN OF SCREEN 500 AS WINDOW TITLE tit,
+*    BEGIN OF LINE,
+*      PUSHBUTTON 2(10) but1 USER-COMMAND cli1,
+*      PUSHBUTTON 12(10) text-020 USER-COMMAND cli2,
+*    END OF LINE,
+*    BEGIN OF LINE,
+*      PUSHBUTTON 2(10) but3 USER-COMMAND cli3,
+*      PUSHBUTTON 12(10) text-040 USER-COMMAND cli4,
+*    END OF LINE,
+*  END OF SCREEN 500.
+*
+*AT SELECTION-SCREEN.
+*
+*  MESSAGE i888(sabapdocu) WITH text-001 sscrfields-ucomm.
+*  CASE sscrfields-ucomm.
+*    WHEN 'CLI1'.
+*      flag = '1'.
+*    WHEN 'CLI2'.
+*      flag = '2'.
+*    WHEN 'CLI3'.
+*      flag = '3'.
+*    WHEN 'CLI4'.
+*      flag = '4'.
+*  ENDCASE.
+*
+*START-OF-SELECTION.
+*
+*  tit  = 'Four Buttons'.
+*  but1 = 'Button 1'.
+*  but3 = 'Button 3'.
+*
+*  CALL SELECTION-SCREEN 500 STARTING AT 10 10.
+*
+*  CASE flag.
+*    WHEN '1'.
+*      WRITE / 'Button 1 was clicked'.
+*    WHEN '2'.
+*      WRITE / 'Button 2 was clicked'.
+*    WHEN '3'.
+*      WRITE / 'Button 3 was clicked'.
+*    WHEN '4'.
+*      WRITE / 'Button 4 was clicked'.
+*    WHEN OTHERS.
+*      WRITE / 'No Button was clicked'.
+*  ENDCASE.
+
+
+
+
+*  FIELD-SYMBOLS : <gt_data>       TYPE STANDARD TABLE .
+*
+*SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME .
+*  PARAMETERS : p_file TYPE ibipparms-path OBLIGATORY,
+*               p_ncol TYPE i OBLIGATORY DEFAULT 10.
+*SELECTION-SCREEN END OF BLOCK b1 .
+*
+**--------------------------------------------------------------------*
+** at selection screen
+**--------------------------------------------------------------------*
+*AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_file.
+*
+*  DATA: lv_rc TYPE i.
+*  DATA: lt_file_table TYPE filetable,
+*        ls_file_table TYPE file_table.
+*
+*  CALL METHOD cl_gui_frontend_services=>file_open_dialog
+*    EXPORTING
+*      window_title = 'Select a file'
+*    CHANGING
+*      file_table   = lt_file_table
+*      rc           = lv_rc.
+*  IF sy-subrc = 0.
+*    READ TABLE lt_file_table INTO ls_file_table INDEX 1.
+*    p_file = ls_file_table-filename.
+*  ENDIF.
+*
+*START-OF-SELECTION .
+*
+*  PERFORM read_file .
+*  PERFORM process_file.
+*
+**---------------------------------------------------------------------*
+** Form READ_FILE
+**---------------------------------------------------------------------*
+*FORM read_file .
+*
+*  DATA : lv_filename      TYPE string,
+*         lt_records       TYPE solix_tab,
+*         lv_headerxstring TYPE xstring,
+*         lv_filelength    TYPE i.
+*
+*  lv_filename = p_file.
+*
+*  CALL FUNCTION 'GUI_UPLOAD'
+*    EXPORTING
+*      filename                = lv_filename
+*      filetype                = 'BIN'
+*    IMPORTING
+*      filelength              = lv_filelength
+*      header                  = lv_headerxstring
+*    TABLES
+*      data_tab                = lt_records
+*    EXCEPTIONS
+*      file_open_error         = 1
+*      file_read_error         = 2
+*      no_batch                = 3
+*      gui_refuse_filetransfer = 4
+*      invalid_type            = 5
+*      no_authority            = 6
+*      unknown_error           = 7
+*      bad_data_format         = 8
+*      header_not_allowed      = 9
+*      separator_not_allowed   = 10
+*      header_too_long         = 11
+*      unknown_dp_error        = 12
+*      access_denied           = 13
+*      dp_out_of_memory        = 14
+*      disk_full               = 15
+*      dp_timeout              = 16
+*      OTHERS                  = 17.
+*
+*  "convert binary data to xstring
+*  "if you are using cl_fdt_xl_spreadsheet in odata then skips this step
+*  "as excel file will already be in xstring
+*  CALL FUNCTION 'SCMS_BINARY_TO_XSTRING'
+*    EXPORTING
+*      input_length = lv_filelength
+*    IMPORTING
+*      buffer       = lv_headerxstring
+*    TABLES
+*      binary_tab   = lt_records
+*    EXCEPTIONS
+*      failed       = 1
+*      OTHERS       = 2.
+*
+*  IF sy-subrc <> 0.
+*    "Implement suitable error handling here
+*  ENDIF.
+*
+*  DATA : lo_excel_ref TYPE REF TO cl_fdt_xl_spreadsheet .
+*
+*  TRY .
+*      lo_excel_ref = NEW cl_fdt_xl_spreadsheet(
+*                              document_name = lv_filename
+*                              xdocument     = lv_headerxstring ) .
+*    CATCH cx_fdt_excel_core.
+*      "Implement suitable error handling here
+*  ENDTRY .
+*
+*  "Get List of Worksheets
+*  lo_excel_ref->if_fdt_doc_spreadsheet~get_worksheet_names(
+*    IMPORTING
+*      worksheet_names = DATA(lt_worksheets) ).
+*
+*  IF NOT lt_worksheets IS INITIAL.
+*    READ TABLE lt_worksheets INTO DATA(lv_woksheetname) INDEX 1.
+*
+*    DATA(lo_data_ref) = lo_excel_ref->if_fdt_doc_spreadsheet~get_itab_from_worksheet(
+*                                             lv_woksheetname ).
+*    "now you have excel work sheet data in dyanmic internal table
+*    ASSIGN lo_data_ref->* TO <gt_data>.
+*  ENDIF.
+*
+*ENDFORM.
+*
+**---------------------------------------------------------------------*
+** Form PROCESS_FILE
+**---------------------------------------------------------------------*
+*FORM process_file .
+*
+*  DATA : lv_numberofcolumns   TYPE i,
+*         lv_date_string       TYPE string,
+*         lv_target_date_field TYPE datum.
+*
+*
+*  FIELD-SYMBOLS : <ls_data>  TYPE any,
+*                  <lv_field> TYPE any.
+*
+*  "you could find out number of columns dynamically from table <gt_data>
+*  lv_numberofcolumns = p_ncol .
+*
+*  LOOP AT <gt_data> ASSIGNING <ls_data> FROM 2 .
+*
+*    "processing columns
+*    DO lv_numberofcolumns TIMES.
+*      ASSIGN COMPONENT sy-index OF STRUCTURE <ls_data> TO <lv_field> .
+*      IF sy-subrc = 0 .
+*        CASE sy-index .
+**          when 1 .
+**          when 2 .
+*          WHEN 10 .
+*            lv_date_string = <lv_field> .
+*            PERFORM date_convert USING lv_date_string CHANGING lv_target_date_field .
+*            WRITE lv_target_date_field .
+*          WHEN OTHERS.
+*            WRITE : <lv_field> .
+*        ENDCASE .
+*      ENDIF.
+*    ENDDO .
+*    NEW-LINE .
+*  ENDLOOP .
+*ENDFORM.
+*
+**---------------------------------------------------------------------*
+** Form DATE_CONVERT
+**---------------------------------------------------------------------*
+*FORM date_convert USING iv_date_string TYPE string CHANGING cv_date TYPE datum .
+*
+*  DATA: lv_convert_date(10) TYPE c.
+*
+*  lv_convert_date = iv_date_string .
+*
+*  "date format YYYY/MM/DD
+*  FIND REGEX '^\d{4}[/|-]\d{1,2}[/|-]\d{1,2}$' IN lv_convert_date.
+*  IF sy-subrc = 0.
+*    CALL FUNCTION '/SAPDMC/LSM_DATE_CONVERT'
+*      EXPORTING
+*        date_in             = lv_convert_date
+*        date_format_in      = 'DYMD'
+*        to_output_format    = ' '
+*        to_internal_format  = 'X'
+*      IMPORTING
+*        date_out            = lv_convert_date
+*      EXCEPTIONS
+*        illegal_date        = 1
+*        illegal_date_format = 2
+*        no_user_date_format = 3
+*        OTHERS              = 4.
+*  ELSE.
+*
+*    " date format DD/MM/YYYY
+*    FIND REGEX '^\d{1,2}[/|-]\d{1,2}[/|-]\d{4}$' IN lv_convert_date.
+*    IF sy-subrc = 0.
+*      CALL FUNCTION '/SAPDMC/LSM_DATE_CONVERT'
+*        EXPORTING
+*          date_in             = lv_convert_date
+*          date_format_in      = 'DDMY'
+*          to_output_format    = ' '
+*          to_internal_format  = 'X'
+*        IMPORTING
+*          date_out            = lv_convert_date
+*        EXCEPTIONS
+*          illegal_date        = 1
+*          illegal_date_format = 2
+*          no_user_date_format = 3
+*          OTHERS              = 4.
+*    ENDIF.
+*
+*  ENDIF.
+*
+*  IF sy-subrc = 0.
+*    cv_date = lv_convert_date .
+*  ENDIF.
+*
+*ENDFORM .
+
+
+
+**Types For Data to be uploaded
+TYPES : BEGIN OF TY_ITAB,
+        EBELN TYPE EBELN,
+        EBELP TYPE EBELP,
+        MENGE TYPE MENGE,
+        DMBTR TYPE DMBTR,
+        END OF TY_ITAB.
+*&Create a Table Type From Types
+TYPES : TITAB TYPE STANDARD TABLE OF TY_ITAB.
+*&Create Table and Work Area for Data Processing.
+DATA : GT_ITAB TYPE TITAB.
+DATA : GS_ITAB TYPE TY_ITAB.
+*Selection Screen For Getting Filename From User
+PARAMETERS : P_FILE TYPE RLGRAP-FILENAME.
+
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR P_FILE.
+  CALL FUNCTION 'F4_FILENAME'
+   EXPORTING
+     FIELD_NAME          = 'P_FILE'
+   IMPORTING
+     FILE_NAME           = P_FILE.
+
+
+
+START-OF-SELECTION.
+
+CALL FUNCTION 'UPLOAD_XLS_FILE_2_ITAB'
+  EXPORTING
+    I_FILENAME       = P_FILE
+  TABLES
+    E_ITAB           = GT_ITAB
+ EXCEPTIONS
+   FILE_ERROR       = 1
+   OTHERS           = 2.
+IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+CASE SY-SUBRC.
+  WHEN 1.
+  MESSAGE 'Something went wrong in file,Close file and upload again' TYPE 'E'.
+  WHEN 2.
+  MESSAGE 'Error in Uploading file,Try again' TYPE 'E'.
+ENDCASE.
+ENDIF.
+
+*&Reference for CL_SALV_TABLE for Displaying the Output
+DATA GR_TABLE   TYPE REF TO CL_SALV_TABLE.
+
+
+CL_SALV_TABLE=>FACTORY(
+  IMPORTING
+    R_SALV_TABLE   = GR_TABLE
+  CHANGING
+    T_TABLE        = GT_ITAB ).
+
+GR_TABLE->DISPLAY( ).

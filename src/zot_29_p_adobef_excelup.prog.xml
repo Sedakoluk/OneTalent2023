@@ -19,12 +19,21 @@
       <TYPE>N</TYPE>
       <NEXTSCREEN>0100</NEXTSCREEN>
       <LINES>027</LINES>
-      <COLUMNS>120</COLUMNS>
+      <COLUMNS>121</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
        <TYPE>SCREEN</TYPE>
        <NAME>SCREEN</NAME>
+      </RPY_DYCATT>
+      <RPY_DYCATT>
+       <TYPE>CUST_CTRL</TYPE>
+       <NAME>CC_ALV</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
+       <LINE>001</LINE>
+       <COLUMN>003</COLUMN>
+       <LENGTH>119</LENGTH>
+       <HEIGHT>027</HEIGHT>
       </RPY_DYCATT>
      </CONTAINERS>
      <FIELDS>
@@ -176,9 +185,33 @@
      <LENGTH>21</LENGTH>
     </item>
     <item>
+     <ID>I</ID>
+     <KEY>003</KEY>
+     <ENTRY>Dosya Yolu</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>004</KEY>
+     <ENTRY>Form Yazdır</ENTRY>
+     <LENGTH>21</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>005</KEY>
+     <ENTRY>Etiket Yazdır</ENTRY>
+     <LENGTH>23</LENGTH>
+    </item>
+    <item>
      <ID>R</ID>
      <ENTRY>Adobeform - Excel Upload Program</ENTRY>
      <LENGTH>32</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_ALV</KEY>
+     <ENTRY>ALV</ENTRY>
+     <LENGTH>11</LENGTH>
     </item>
     <item>
      <ID>S</ID>
@@ -188,9 +221,9 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_TESLIM</KEY>
-     <ENTRY>ALV</ENTRY>
-     <LENGTH>11</LENGTH>
+     <KEY>P_FILE</KEY>
+     <ENTRY>Dosya Yolu</ENTRY>
+     <LENGTH>18</LENGTH>
     </item>
     <item>
      <ID>S</ID>
