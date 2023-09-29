@@ -5,783 +5,976 @@
 *&---------------------------------------------------------------------*
 REPORT zot_29_p_deneme.
 
-"sayıları tek çift olarak ekrana yazan program
-*DATA gv_sayi TYPE i.
-*DO 101 TIMES.
-*  IF gv_sayi MOD 2 EQ 0.
-*    WRITE:/ 'Çift Sayı', gv_sayi.
-*  ELSE.
-*    WRITE:/ 'Tek Sayı', gv_sayi.
-*  ENDIF.
-*  gv_sayi = gv_sayi + 1.
-*ENDDO.
 
-"MOD - İF
-*DATA: gv_index TYPE i.
-*gv_index = 0.
-*DO 10 TIMES.
-*  gv_index = gv_index + 1.
-*  IF gv_index MOD 2 EQ 0.
-*    WRITE:/ '2''ye tam bölünen sayılar', gv_index.
-*  ENDIF.
-*ENDDO.
-*ULINE.
-*gv_index = 0.
-*DO 10 TIMES.
-*  gv_index = gv_index + 1.
-*  IF gv_index MOD 3 EQ 0.
-*    WRITE:/ '3''e tam bölünen sayılar', gv_index.
-*  ENDIF.
-*ENDDO.
+tables : ekko, ekpo.
 
-*TABLES: zot_29_t_ogrenci.
+INCLUDE <ICON>.
 
-"değişken tanımalama data elementi baz alarak.
-*DATA: gv_ogr_id    TYPE zot_29_e_ogrenci_id,
-*      gv_ogr_ad    TYPE zot_29_e_ogrenci_ad,
-*      gv_ogr_soyad TYPE zot_29_e_ogrenci_soyad,
-*      gv_ders_id   TYPE zot_29_e_ders_id,
-*      gv_puan      TYPE zot_29_e_puan.
+types : begin of tp_list,
+        sel,
+"from header ekko
+         EBELN type EBELN,
+         BSART type ESART,
+         AEDAT type ERDAT,
+         ERNAM type ERNAM,
+         LIFNR type ELIFN,
+"vendor name lfa1
+         NAME1 type NAME1_GP,
+"from item table ekpo
+         EBELP type EBELP,
+         TXZ01 type TXZ01,
+         MATNR type MATNR,
+         MENGE type BSTMG,
+         MEINS type BSTME,
+         NETPR type BPREI,
+         NETWR type BWERT,
+         APPROVE TYPE FLAG,
+         REMARK TYPE CHAR10,
+         LINE_COLOR(4) TYPE C,     "Used to store row color attributes
+         FIELD_COLOR TYPE SLIS_T_SPECIALCOL_ALV,
+         CELLSTYLE  TYPE LVC_T_STYL,
+         ICON1(4),
+         ICON2(4),
+         ICON3(4),
+         ICON4(4),
+        end of tp_list.
 
-"structure ve internal table tanımlama
-*DATA: gs_ogrenci TYPE zot_29_t_ogrenci,
-*      gt_ogrenci TYPE TABLE OF zot_29_t_ogrenci.
-
-*SELECT * FROM zot_29_t_ogrenci
-*  INTO TABLE gt_ogrenci
-*    WHERE ogr_ad EQ 'Seda'.
-*
-*SELECT SINGLE * FROM  zot_29_t_ogrenci
-*  INTO gs_ogrenci.
-*
-*SELECT SINGLE ogr_id from zot_29_t_ogrenci
-*  into gv_ogr_id.
-
-*UPDATE zot_29_t_ogrenci SET ogr_ad = 'Zeynep'
-*  WHERE ogr_id = 1.
-*
-*WRITE: 'Çalıştı'.
+types : begin of tp_ernam,
+        ernam type ekko-ERNAM,
+        end of tp_ernam.
 
 
-*gs_ogrenci-ogr_id    = 2.
-*gs_ogrenci-ogr_ad    = 'Chippy'.
-*gs_ogrenci-ogr_soyad = 'Pap'.
-*gs_ogrenci-ders_id   = 3.
-*gs_ogrenci-puan      = 75.
-*INSERT zot_29_t_ogrenci FROM gs_ogrenci.
-*WRITE: 'Çalıştı'.
+data : gt_list type STANDARD TABLE OF tp_list,
+       gs_list type tp_list,
+       gt_list1 type STANDARD TABLE OF tp_list,
+       gs_list1 type tp_list,
+       gt_lfa1 type STANDARD TABLE OF lfa1,
+       gs_lfa1 type lfa1,
+       gt_ernam type STANDARD TABLE OF tp_ernam,
+       gs_ernam type tp_ernam,
+       gs_field type SLIS_SPECIALCOL_ALV.
 
 
-*DELETE FROM zot_29_t_ogrenci WHERE ogr_id = 1.
-*WRITE: 'Çalıştı'.
+ DATA: GT_CELLSTYLE TYPE lvc_t_styl,
+       gs_cellstyle type LVC_S_STYL.
 
-
-*gs_ogrenci-ogr_id    = 3.
-*gs_ogrenci-ogr_ad    = 'Aslı'.
-*gs_ogrenci-ogr_soyad = 'Yok'.
-*gs_ogrenci-ders_id   = 3.
-*gs_ogrenci-puan      = 55.
-*MODIFY zot_29_t_ogrenci FROM gs_ogrenci.
-*WRITE 'eklendi'.
+DATA: it_return LIKE ddshretval OCCURS 0 WITH HEADER LINE.
 
 
 
-*PARAMETERS p_sayi TYPE int4.
-*START-OF-SELECTION.
-*  WRITE:/  'Girilen Sayı ' , p_sayi.
-*  IF p_sayi > 0 AND p_sayi < 25.
-*    WRITE:/  'Girilen sayı 0-25 arasındadır.'.
-*  ELSEIF p_sayi > 25 AND p_sayi < 50.
-*    WRITE:/  'Girilen sayı 50-75 arasındadır.'.
-*  ELSEIF  p_sayi > 50 AND p_sayi < 75.
-*    WRITE:/  'Girilen sayı 50-75 arasındadır.'.
-*  ELSEIF p_sayi > 75 AND p_sayi < 100.
-*    WRITE:/  'Girilen sayı 75-100 arasındadır.'.
-*  ELSEIF p_sayi > 100.
-*    WRITE:/  'Girilen sayı 100''den büyüktür.'.
-*  ENDIF.
+"ALV fieldcatalog
+DATA:  GT_FCAT    TYPE LVC_T_FCAT,               "slis_t_fieldcat_alv,
+       GS_FCAT    LIKE LINE OF GT_FCAT,
+       GS_LAYOUT  TYPE LVC_S_LAYO,               "slis_layout_alv,
+       GS_VARIANT TYPE DISVARIANT,               "For Save Variant
+       GS_GRID    TYPE LVC_S_GLAY,
+       gv_cnt type i.
+
+"ALV fieldcatalog
+DATA:  GT_FCAT1    TYPE LVC_T_FCAT,               "slis_t_fieldcat_alv,
+       GS_FCAT1    LIKE LINE OF GT_FCAT,
+       GS_LAYOUT1  TYPE LVC_S_LAYO,               "slis_layout_alv,
+       GS_VARIANT1 TYPE DISVARIANT,               "For Save Variant
+       GS_GRID1    TYPE LVC_S_GLAY,
+       gv_cnt1 type i.
+
+  DATA: T_HEADER       TYPE SLIS_T_LISTHEADER,
+        WA_HEADER      TYPE SLIS_LISTHEADER,
+        T_LINE         LIKE WA_HEADER-INFO,
+        LD_LINES       TYPE I,
+        LD_LINESC(10)  TYPE C,
+        TODAY_DT(10),
+        TODAY_TIME(10).
+
+DATA: r_dd_table TYPE REF TO cl_dd_table_area.
+
+
+SELECTION-SCREEN begin of BLOCK b1 WITH FRAME TITLE text-001.
+  select-OPTIONS  : s_ebeln for ekko-ebeln,
+                    s_ebelp for ekpo-ebelp,
+                    s_aedat for ekko-aedat,
+                    s_ernam for ekko-ernam MODIF ID HID,
+                    s_bsart for ekko-bsart MODIF ID DIS.
+ SELECTION-SCREEN SKIP.
+   PARAMETERS : R_ALL RADIOBUTTON GROUP GRP USER-COMMAND CMD,
+                R_WO RADIOBUTTON GROUP GRP,
+                R_SO RADIOBUTTON GROUP GRP.
+SELECTION-SCREEN end of BLOCK b1.
+
+ INITIALIZATION.
+     S_AEDAT-SIGN   = 'I'.
+     S_AEDAT-OPTION = 'BT'.
+     S_AEDAT-LOW    = SY-DATUM - 365.
+     S_AEDAT-HIGH   = SY-DATUM.
+     APPEND S_AEDAT.
+
+  IF R_ALL IS INITIAL AND R_WO IS INITIAL AND R_SO IS INITIAL.
+     R_ALL = 'X'.
+  ENDIF.
+
+at SELECTION-SCREEN OUTPUT.  "PBO
+
+  IF R_ALL = 'X'.
+     CLEAR : S_BSART[].
+  ELSEIF R_WO = 'X'.
+
+   CLEAR : S_BSART[].
+   S_BSART-SIGN    = 'I'.
+   S_BSART-OPTION  = 'EQ'.
+   S_BSART-LOW     = 'XSWO'.
+   append s_bsart.
+
+  ELSEIF R_SO = 'X'.
+   CLEAR : S_BSART[].
+   S_BSART-SIGN    = 'I'.
+   S_BSART-OPTION  = 'EQ'.
+   S_BSART-LOW     = 'ZLOC'.
+   append s_bsart.
+  ENDIF.
+
+  LOOP AT SCREEN.
+  IF R_ALL IS INITIAL AND SCREEN-GROUP1 = 'DIS'.
+     SCREEN-INPUT = 0.
+     MODIFY SCREEN.
+  ENDIF.
+
+  IF R_ALL IS INITIAL AND SCREEN-GROUP1 = 'HID'.
+     SCREEN-ACTIVE = 0.
+     MODIFY SCREEN.
+  ENDIF.
+
+  ENDLOOP.
+
+AT SELECTION-SCREEN. "validation
+
+*   IF S_ERNAM-LOW IS INITIAL.
+*      message 'Enter the created by' TYPE 'E'.
+*   ENDIF.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR S_ERNAM-LOW.
+
+   clear : gt_ernam[].
+   gs_ernam-ERNAM  = 'DEVELOPER1'.
+   append gs_ernam to gt_ernam.
+   gs_ernam-ERNAM  = 'KISHORM'.
+   append gs_ernam to gt_ernam.
+      gs_ernam-ERNAM  = 'ZAFARK'.
+   append gs_ernam to gt_ernam.
 
 
 
-*PARAMETERS p_sayi TYPE i.
-*START-OF-SELECTION.
-*  IF p_sayi < 0 OR  p_sayi > 100.
-*    WRITE:/ '0 ile 100 arasında sayı giriniz.'.
-*  ELSE.
-*    WRITE :/ 'Harf notunuz: ' .
-*    IF p_sayi >= 0 AND p_sayi <= 20.
-*      WRITE 'FF'.
-*    ELSEIF p_sayi >= 21 AND p_sayi <= 40.
-*      WRITE 'DD'.
-*    ELSEIF p_sayi >= 41 AND p_sayi <= 60.
-*      WRITE 'CC'.
-*    ELSEIF p_sayi >= 61 AND p_sayi <= 80.
-*      WRITE 'BB'.
-*    ELSEIF p_sayi >= 81 AND p_sayi <= 100.
-*      WRITE 'AA'.
-*    ENDIF.
-*  ENDIF.
+CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
+  EXPORTING
+*   DDIC_STRUCTURE         = ' '
+    RETFIELD               = 'ERNAM'
+*   PVALKEY                = ' '
+*   DYNPPROG               = ' '
+*   DYNPNR                 = ' '
+*   DYNPROFIELD            = ' '
+*   STEPL                  = 0
+*   WINDOW_TITLE           =
+*   VALUE                  = ' '
+   VALUE_ORG              = 'S'
+*   MULTIPLE_CHOICE        = ' '
+*   DISPLAY                = ' '
+*   CALLBACK_PROGRAM       = ' '
+*   CALLBACK_FORM          = ' '
+*   CALLBACK_METHOD        =
+*   MARK_TAB               =
+* IMPORTING
+*   USER_RESET             =
+  TABLES
+    VALUE_TAB              = gt_ernam
+*   FIELD_TAB              =
+   RETURN_TAB             = IT_RETURN
+*   DYNPFLD_MAPPING        =
+ EXCEPTIONS
+   PARAMETER_ERROR        = 1
+   NO_VALUES_FOUND        = 2
+   OTHERS                 = 3
+          .
+IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+ENDIF.
 
+  WRITE it_return-fieldval TO S_ERNAM-LOW.
+  REFRESH gt_ernam.
 
-*PARAMETERS : p_sayi1 TYPE i OBLIGATORY,
-*             p_sayi2 TYPE i OBLIGATORY,
-*             p_sayi3 TYPE i OBLIGATORY.
-*START-OF-SELECTION.
-*  IF p_sayi1 BETWEEN p_sayi2.
-*    WRITE:/ 'Birinci Sayı ve İkinci Sayı Arasındadır'.
-*  ELSEIF p_sayi1 BETWEEN p_sayi3.
-*    WRITE:/ 'Birinci Sayı ve Üçüncü Sayı Arasındadır'.
-*  ELSEIF p_sayi2 BETWEEN p_sayi3.
-*    WRITE:/ 'İkinci Sayi ve Üçüncü Sayı Arasındadır'.
-*  ENDIF.
-
-
-*PARAMETERS : p_sayi1 TYPE i OBLIGATORY,
-*             p_sayi2 TYPE i OBLIGATORY,
-*             p_sayi3 TYPE i OBLIGATORY.
-*START-OF-SELECTION.
-*  IF ( p_sayi1 LT p_sayi2 AND p_sayi1 GT p_sayi3 ) OR ( p_sayi1 GT p_sayi2 AND p_sayi1 LT p_sayi3 ).
-*    WRITE: / 'birinci sayı diğer iki sayının arasındadır.'.
-*  ELSEIF ( p_sayi2 LT p_sayi1 AND p_sayi2 GT p_sayi3 ) OR ( p_sayi2 GT p_sayi1 AND p_sayi2 LT p_sayi3 ).
-*    WRITE: / 'ikinci sayı diğer iki sayının arasındadır.'.
-*  ELSEIF ( p_sayi3 LT p_sayi1 AND p_sayi3 GT p_sayi2 ) OR ( p_sayi3 GT p_sayi1 AND p_sayi3 LT p_sayi2 ).
-*    WRITE: / 'üçüncü sayı diğer iki sayının arasındadır.'.
-*  ENDIF.
-
-
-*PARAMETERS : p_sayi1 TYPE i OBLIGATORY,
-*             p_sayi2 TYPE i OBLIGATORY,
-*             p_islem TYPE c OBLIGATORY.
-*DATA gv_sonuc TYPE i.
-*START-OF-SELECTION.
-*  CASE p_islem.
-*    WHEN '+'.
-*      gv_sonuc =  p_sayi1 + p_sayi2.
-*      WRITE: / 'Toplama işleminin sonucu: ', gv_sonuc.
-*    WHEN '-'.
-*      gv_sonuc =  p_sayi1 - p_sayi2.
-*      WRITE: / 'Çıkarma işleminin sonucu: ', gv_sonuc.
-*    WHEN '*'.
-*      gv_sonuc =  p_sayi1 * p_sayi2.
-*      WRITE: / 'Çarpma işleminin sonucu: ', gv_sonuc.
-*    WHEN '/'.
-*      gv_sonuc =  p_sayi1 / p_sayi2.
-*      WRITE: / 'Bölme işleminin sonucu: ', gv_sonuc.
-*  ENDCASE.
-
-
-*PARAMETERS: cbox1 AS CHECKBOX, "2 ekle
-*            cbox2 AS CHECKBOX, "3 ekle
-*            cbox3 AS CHECKBOX. "5 ekle
-*DATA: gv_sonuc TYPE i VALUE 10.
-*IF cbox1 EQ abap_true.
-*  gv_sonuc = gv_sonuc + 2.
-*ENDIF.
-*IF cbox2 EQ abap_true.
-*  gv_sonuc = gv_sonuc + 3.
-*ENDIF.
-*IF cbox3 EQ abap_true.
-*  gv_sonuc = gv_sonuc + 5.
-*ENDIF.
-*WRITE: / gv_sonuc.
-
-
-*PARAMETERS: p_sayi1 TYPE i,
-*            p_sayi2 TYPE i.
-*PARAMETERS: rb1 RADIOBUTTON GROUP gp1, "toplama
-*            rb2 RADIOBUTTON GROUP gp1, "çıkarma
-*            rb3 RADIOBUTTON GROUP gp1, "çarpma
-*            rb4 RADIOBUTTON GROUP gp1. "bölme
-*DATA: gv_sonuc TYPE i.
-*START-OF-SELECTION.
-*  IF rb1 EQ abap_true.
-*    PERFORM toplama.
-*  ELSEIF rb2 EQ abap_true.
-*    PERFORM cikarma.
-*  ELSEIF rb3 EQ abap_true.
-*    PERFORM carpma.
-*  ELSEIF rb4 EQ abap_true.
-*    PERFORM bolme.
-*  ENDIF.
-*FORM toplama.
-*  gv_sonuc = p_sayi1 + p_sayi2.
-*  WRITE:/ p_sayi1 , '+' , p_sayi2 , '=' , gv_sonuc.
-*ENDFORM.
-*FORM cikarma.
-*  gv_sonuc = p_sayi1 - p_sayi2.
-*  WRITE:/ p_sayi1 , '-' , p_sayi2 , '=' , gv_sonuc.
-*ENDFORM.
-*FORM carpma.
-*  gv_sonuc = p_sayi1 * p_sayi2.
-*  WRITE:/ p_sayi1 , '*' , p_sayi2 , '=' , gv_sonuc.
-*ENDFORM.
-*FORM bolme.
-*  gv_sonuc = p_sayi1 / p_sayi2.
-*  WRITE:/ p_sayi1 , '/' , p_sayi2 , '=' , gv_sonuc.
-*ENDFORM.
-
-
-*PARAMETERS: p_sayi1 TYPE i,
-*            p_sayi2 TYPE i.
-*PARAMETERS: rb1 RADIOBUTTON GROUP gp1, "toplama
-*            rb2 RADIOBUTTON GROUP gp1, "çıkarma
-*            rb3 RADIOBUTTON GROUP gp1, "çarpma
-*            rb4 RADIOBUTTON GROUP gp1. "bölme
-*PARAMETERS: cbox1 AS CHECKBOX, "10 ile çarp
-*            cbox2 AS CHECKBOX. "2'ye böl
-*DATA gv_sonuc TYPE i.
-*START-OF-SELECTION.
-*  CASE abap_true.
-*    WHEN rb1.
-*      gv_sonuc = p_sayi1 + p_sayi2.
-*      WRITE:/  gv_sonuc.
-*    WHEN rb2.
-*      gv_sonuc = p_sayi1 - p_sayi2.
-*      WRITE:/  gv_sonuc.
-*    WHEN rb3.
-*      gv_sonuc = p_sayi1 * p_sayi2.
-*      WRITE:/  gv_sonuc.
-*    WHEN rb4.
-*      gv_sonuc = p_sayi1 / p_sayi2.
-*      WRITE:/ gv_sonuc.
-*  ENDCASE.
-*  IF cbox1 EQ abap_true.
-*    gv_sonuc = gv_sonuc * 10.
-*  ENDIF.
-*  IF cbox2 EQ abap_true.
-*    gv_sonuc = gv_sonuc / 2.
-*  ENDIF.
-*  WRITE : / gv_sonuc.
-
-
-*PARAMETERS p_sayi TYPE i.
-*INITIALIZATION.
-*  p_sayi = 20.
-*AT SELECTION-SCREEN.
-*  p_sayi = p_sayi + 1.
-*START-OF-SELECTION.
-*  WRITE: 'start of selection kodu çalıştı'.
-*END-OF-SELECTION.
-*  WRITE: 'end of selection kodu çalıştı'.
-
-
-*PARAMETERS: p_sayi1 TYPE i,
-*            p_sayi2 TYPE i.
-*PERFORM iki_sayinin_orani.
-*FORM iki_sayinin_orani.
-*  DATA lv_sonuc TYPE p DECIMALS 2.
-*  IF p_sayi1 > p_sayi2 .
-*    lv_sonuc = p_sayi1 / p_sayi2.
-*    WRITE :/ lv_sonuc.
-*  ELSEIF p_sayi2 > p_sayi1 .
-*    lv_sonuc = p_sayi2 / p_sayi1.
-*    WRITE :/ lv_sonuc.
-*  ENDIF.
-*ENDFORM.
-
-
-*START-OF-SELECTION.
-*  PERFORM seda.
-*  PERFORM abap.
-*  PERFORM yazilim.
-*  PERFORM biraz.
-*  PERFORM zorlaniyor.
-*  PERFORM ama.
-*  PERFORM yazilim. "yazılım
-*  PERFORM dillerinden.
-*  PERFORM abap. "abap
-*  PERFORM seda. "seda
-*  PERFORM icin.
-*  PERFORM hic.
-*  PERFORM zor.
-*  PERFORM degil.
-*  PERFORM yeni_satir.
-*  PERFORM seda. "seda
-*  PERFORM biraz. "biraz
-*  PERFORM isterse.
-*  PERFORM yapar.
-*  PERFORM yeni_satir.
-*  PERFORM seda.
-*  PERFORM yazilim.
-*  PERFORM dillerinden.
-*  PERFORM abap.
-*  PERFORM zor.
-*  PERFORM degil.
-*  "seda yazılım dillerinden abap zor değil
-*FORM seda.
-*  WRITE 'Seda'.
-*ENDFORM.
-*FORM abap.
-*  WRITE 'abap'.
-*ENDFORM.
-*FORM yazilim.
-*  WRITE 'yazılım'.
-*ENDFORM.
-*FORM biraz.
-*  WRITE 'biraz'.
-*ENDFORM.
-*FORM zorlaniyor.
-*  WRITE 'zorlanıyor'.
-*ENDFORM.
-*FORM ama.
-*  WRITE 'ama'.
-*ENDFORM.
-*FORM dillerinden.
-*  WRITE 'dillerinden'.
-*ENDFORM.
-*FORM icin.
-*  WRITE 'için'.
-*ENDFORM.
-*FORM hic.
-*  WRITE 'hiç'.
-*ENDFORM.
-*FORM zor.
-*  WRITE 'zor'.
-*ENDFORM.
-*FORM degil.
-*  WRITE 'değil'.
-*ENDFORM.
-*FORM isterse.
-*  WRITE 'isterse'.
-*ENDFORM.
-*FORM yapar.
-*  WRITE 'yapar'.
-*ENDFORM.
-*FORM yeni_satir.
-*  WRITE /.
-*ENDFORM.
-
-
-*DATA gv_sayi TYPE i VALUE 10.
-*START-OF-SELECTION.
-*PERFORM 7ekle.
-*PERFORM 7ekle.
-*PERFORM 7ekle.
-*PERFORM 3carp.
-*PERFORM 7ekle.
-*PERFORM 4cikar.
-*PERFORM 4cikar.
-*PERFORM 4cikar.
-*PERFORM 4cikar.
-*perform 2bol.
-*  WRITE: gv_sayi.  "42
-*FORM 7ekle.
-*  gv_sayi = gv_sayi + 7.
-*ENDFORM.
-*FORM 4cikar.
-*  gv_sayi = gv_sayi - 4.
-*ENDFORM.
-*FORM 2bol.
-*  gv_sayi = gv_sayi / 2.
-*ENDFORM.
-*FORM 3carp.
-*  gv_sayi = gv_sayi * 3.
-*ENDFORM.
-
-
-
-*PARAMETERS: p_user TYPE c LENGTH 20,
-*            p_pass TYPE c LENGTH 10.
-*AT SELECTION-SCREEN OUTPUT. " Girilen değerlerin doğrulanması ve kontrolleri burada gerçekleşir.
-*  LOOP AT SCREEN.
-*    IF screen-name = 'P_PASS'. "parametre ismi büyük harfle yazılmalı!!
-*      screen-invisible = 1.
-*      MODIFY SCREEN.
-*    ENDIF.
-*  ENDLOOP.
-*START-OF-SELECTION.
-*  IF p_user EQ 'SEDAYAMAN' AND p_pass EQ '12345'.
-*    WRITE : / 'Giriş başarılı'.
-*  ELSE.
-*    WRITE : / 'Kullanıcı adı veya parola hatalı'.
-*  ENDIF.
-
-
-*  WRITE: 'User name is : ' , p_user,
-*  /'Password is : ', p_pass.
-
-
-
-*DATA gv_sayi TYPE int4.
-*
-*START-OF-SELECTION.
-*
-*  CALL FUNCTION 'QF05_RANDOM_INTEGER'
-*    EXPORTING
-*      ran_int_max   = 150
-*      ran_int_min   = 1
-*    IMPORTING
-*      ran_int       = gv_sayi
-*    EXCEPTIONS
-*      invalid_input = 1
-*      OTHERS        = 2.
-*  IF gv_sayi > 0 AND gv_sayi < 25.
-*
-*    WRITE:/ 'Üretilen Sayı : ', gv_sayi,
-*          / '0 - 25 arasındadır.'.
-*
-*  ELSEIF gv_sayi > 25 AND gv_sayi < 50.
-*
-*    WRITE:/ 'Üretilen Sayı : ', gv_sayi,
-*          / '25 - 50 arasındadır.'.
-*
-*  ELSEIF gv_sayi > 50 AND gv_sayi < 75.
-*
-*    WRITE:/ 'Üretilen Sayı : ', gv_sayi,
-*          / '50 - 75 arasındadır.'.
-*
-*  ELSEIF gv_sayi > 75 AND gv_sayi < 100.
-*
-*    WRITE:/ 'Üretilen Sayı : ', gv_sayi,
-*          / '75 - 100 arasındadır.'.
-*
-*  ELSEIF gv_sayi >= 100.
-*
-*    WRITE:/ 'Üretilen Sayı : ', gv_sayi,
-*          / 'Sayı 100''den büyüktür.'.
-*
-*  ENDIF.
-
-
-*PARAMETERS: a1 RADIOBUTTON GROUP a DEFAULT 'X' USER-COMMAND rg1,
-*            a2 RADIOBUTTON GROUP a.
-*PARAMETERS: box1(10)        DEFAULT 'India' MODIF ID rg1,
-*            box2(10)        MODIF ID rg2.
-*
-*AT SELECTION-SCREEN OUTPUT.
-*
-*  LOOP AT SCREEN.
-*    IF screen-group1 = 'RG1'.
-*      IF a2 = 'X'.
-*        screen-active = 0.
-*        MODIFY SCREEN.
-*      ENDIF.
-*    ENDIF.
-*    IF screen-group1 = 'RG2'.
-*      IF a1 = 'X'.
-*        screen-active = 0.
-*        MODIFY SCREEN.
-*      ENDIF.
-*    ENDIF.
-*  ENDLOOP.
-
-
-*TABLES sscrfields.
-*
-*DATA flag(1) TYPE c.
-*
-*SELECTION-SCREEN:
-*  BEGIN OF SCREEN 500 AS WINDOW TITLE tit,
-*    BEGIN OF LINE,
-*      PUSHBUTTON 2(10) but1 USER-COMMAND cli1,
-*      PUSHBUTTON 12(10) text-020 USER-COMMAND cli2,
-*    END OF LINE,
-*    BEGIN OF LINE,
-*      PUSHBUTTON 2(10) but3 USER-COMMAND cli3,
-*      PUSHBUTTON 12(10) text-040 USER-COMMAND cli4,
-*    END OF LINE,
-*  END OF SCREEN 500.
-*
-*AT SELECTION-SCREEN.
-*
-*  MESSAGE i888(sabapdocu) WITH text-001 sscrfields-ucomm.
-*  CASE sscrfields-ucomm.
-*    WHEN 'CLI1'.
-*      flag = '1'.
-*    WHEN 'CLI2'.
-*      flag = '2'.
-*    WHEN 'CLI3'.
-*      flag = '3'.
-*    WHEN 'CLI4'.
-*      flag = '4'.
-*  ENDCASE.
-*
-*START-OF-SELECTION.
-*
-*  tit  = 'Four Buttons'.
-*  but1 = 'Button 1'.
-*  but3 = 'Button 3'.
-*
-*  CALL SELECTION-SCREEN 500 STARTING AT 10 10.
-*
-*  CASE flag.
-*    WHEN '1'.
-*      WRITE / 'Button 1 was clicked'.
-*    WHEN '2'.
-*      WRITE / 'Button 2 was clicked'.
-*    WHEN '3'.
-*      WRITE / 'Button 3 was clicked'.
-*    WHEN '4'.
-*      WRITE / 'Button 4 was clicked'.
-*    WHEN OTHERS.
-*      WRITE / 'No Button was clicked'.
-*  ENDCASE.
-
-
-
-
-*  FIELD-SYMBOLS : <gt_data>       TYPE STANDARD TABLE .
-*
-*SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME .
-*  PARAMETERS : p_file TYPE ibipparms-path OBLIGATORY,
-*               p_ncol TYPE i OBLIGATORY DEFAULT 10.
-*SELECTION-SCREEN END OF BLOCK b1 .
-*
-**--------------------------------------------------------------------*
-** at selection screen
-**--------------------------------------------------------------------*
-*AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_file.
-*
-*  DATA: lv_rc TYPE i.
-*  DATA: lt_file_table TYPE filetable,
-*        ls_file_table TYPE file_table.
-*
-*  CALL METHOD cl_gui_frontend_services=>file_open_dialog
-*    EXPORTING
-*      window_title = 'Select a file'
-*    CHANGING
-*      file_table   = lt_file_table
-*      rc           = lv_rc.
-*  IF sy-subrc = 0.
-*    READ TABLE lt_file_table INTO ls_file_table INDEX 1.
-*    p_file = ls_file_table-filename.
-*  ENDIF.
-*
-*START-OF-SELECTION .
-*
-*  PERFORM read_file .
-*  PERFORM process_file.
-*
-**---------------------------------------------------------------------*
-** Form READ_FILE
-**---------------------------------------------------------------------*
-*FORM read_file .
-*
-*  DATA : lv_filename      TYPE string,
-*         lt_records       TYPE solix_tab,
-*         lv_headerxstring TYPE xstring,
-*         lv_filelength    TYPE i.
-*
-*  lv_filename = p_file.
-*
-*  CALL FUNCTION 'GUI_UPLOAD'
-*    EXPORTING
-*      filename                = lv_filename
-*      filetype                = 'BIN'
-*    IMPORTING
-*      filelength              = lv_filelength
-*      header                  = lv_headerxstring
-*    TABLES
-*      data_tab                = lt_records
-*    EXCEPTIONS
-*      file_open_error         = 1
-*      file_read_error         = 2
-*      no_batch                = 3
-*      gui_refuse_filetransfer = 4
-*      invalid_type            = 5
-*      no_authority            = 6
-*      unknown_error           = 7
-*      bad_data_format         = 8
-*      header_not_allowed      = 9
-*      separator_not_allowed   = 10
-*      header_too_long         = 11
-*      unknown_dp_error        = 12
-*      access_denied           = 13
-*      dp_out_of_memory        = 14
-*      disk_full               = 15
-*      dp_timeout              = 16
-*      OTHERS                  = 17.
-*
-*  "convert binary data to xstring
-*  "if you are using cl_fdt_xl_spreadsheet in odata then skips this step
-*  "as excel file will already be in xstring
-*  CALL FUNCTION 'SCMS_BINARY_TO_XSTRING'
-*    EXPORTING
-*      input_length = lv_filelength
-*    IMPORTING
-*      buffer       = lv_headerxstring
-*    TABLES
-*      binary_tab   = lt_records
-*    EXCEPTIONS
-*      failed       = 1
-*      OTHERS       = 2.
-*
-*  IF sy-subrc <> 0.
-*    "Implement suitable error handling here
-*  ENDIF.
-*
-*  DATA : lo_excel_ref TYPE REF TO cl_fdt_xl_spreadsheet .
-*
-*  TRY .
-*      lo_excel_ref = NEW cl_fdt_xl_spreadsheet(
-*                              document_name = lv_filename
-*                              xdocument     = lv_headerxstring ) .
-*    CATCH cx_fdt_excel_core.
-*      "Implement suitable error handling here
-*  ENDTRY .
-*
-*  "Get List of Worksheets
-*  lo_excel_ref->if_fdt_doc_spreadsheet~get_worksheet_names(
-*    IMPORTING
-*      worksheet_names = DATA(lt_worksheets) ).
-*
-*  IF NOT lt_worksheets IS INITIAL.
-*    READ TABLE lt_worksheets INTO DATA(lv_woksheetname) INDEX 1.
-*
-*    DATA(lo_data_ref) = lo_excel_ref->if_fdt_doc_spreadsheet~get_itab_from_worksheet(
-*                                             lv_woksheetname ).
-*    "now you have excel work sheet data in dyanmic internal table
-*    ASSIGN lo_data_ref->* TO <gt_data>.
-*  ENDIF.
-*
-*ENDFORM.
-*
-**---------------------------------------------------------------------*
-** Form PROCESS_FILE
-**---------------------------------------------------------------------*
-*FORM process_file .
-*
-*  DATA : lv_numberofcolumns   TYPE i,
-*         lv_date_string       TYPE string,
-*         lv_target_date_field TYPE datum.
-*
-*
-*  FIELD-SYMBOLS : <ls_data>  TYPE any,
-*                  <lv_field> TYPE any.
-*
-*  "you could find out number of columns dynamically from table <gt_data>
-*  lv_numberofcolumns = p_ncol .
-*
-*  LOOP AT <gt_data> ASSIGNING <ls_data> FROM 2 .
-*
-*    "processing columns
-*    DO lv_numberofcolumns TIMES.
-*      ASSIGN COMPONENT sy-index OF STRUCTURE <ls_data> TO <lv_field> .
-*      IF sy-subrc = 0 .
-*        CASE sy-index .
-**          when 1 .
-**          when 2 .
-*          WHEN 10 .
-*            lv_date_string = <lv_field> .
-*            PERFORM date_convert USING lv_date_string CHANGING lv_target_date_field .
-*            WRITE lv_target_date_field .
-*          WHEN OTHERS.
-*            WRITE : <lv_field> .
-*        ENDCASE .
-*      ENDIF.
-*    ENDDO .
-*    NEW-LINE .
-*  ENDLOOP .
-*ENDFORM.
-*
-**---------------------------------------------------------------------*
-** Form DATE_CONVERT
-**---------------------------------------------------------------------*
-*FORM date_convert USING iv_date_string TYPE string CHANGING cv_date TYPE datum .
-*
-*  DATA: lv_convert_date(10) TYPE c.
-*
-*  lv_convert_date = iv_date_string .
-*
-*  "date format YYYY/MM/DD
-*  FIND REGEX '^\d{4}[/|-]\d{1,2}[/|-]\d{1,2}$' IN lv_convert_date.
-*  IF sy-subrc = 0.
-*    CALL FUNCTION '/SAPDMC/LSM_DATE_CONVERT'
-*      EXPORTING
-*        date_in             = lv_convert_date
-*        date_format_in      = 'DYMD'
-*        to_output_format    = ' '
-*        to_internal_format  = 'X'
-*      IMPORTING
-*        date_out            = lv_convert_date
-*      EXCEPTIONS
-*        illegal_date        = 1
-*        illegal_date_format = 2
-*        no_user_date_format = 3
-*        OTHERS              = 4.
-*  ELSE.
-*
-*    " date format DD/MM/YYYY
-*    FIND REGEX '^\d{1,2}[/|-]\d{1,2}[/|-]\d{4}$' IN lv_convert_date.
-*    IF sy-subrc = 0.
-*      CALL FUNCTION '/SAPDMC/LSM_DATE_CONVERT'
-*        EXPORTING
-*          date_in             = lv_convert_date
-*          date_format_in      = 'DDMY'
-*          to_output_format    = ' '
-*          to_internal_format  = 'X'
-*        IMPORTING
-*          date_out            = lv_convert_date
-*        EXCEPTIONS
-*          illegal_date        = 1
-*          illegal_date_format = 2
-*          no_user_date_format = 3
-*          OTHERS              = 4.
-*    ENDIF.
-*
-*  ENDIF.
-*
-*  IF sy-subrc = 0.
-*    cv_date = lv_convert_date .
-*  ENDIF.
-*
-*ENDFORM .
-
-
-
-**Types For Data to be uploaded
-TYPES : BEGIN OF TY_ITAB,
-        EBELN TYPE EBELN,
-        EBELP TYPE EBELP,
-        MENGE TYPE MENGE,
-        DMBTR TYPE DMBTR,
-        END OF TY_ITAB.
-*&Create a Table Type From Types
-TYPES : TITAB TYPE STANDARD TABLE OF TY_ITAB.
-*&Create Table and Work Area for Data Processing.
-DATA : GT_ITAB TYPE TITAB.
-DATA : GS_ITAB TYPE TY_ITAB.
-*Selection Screen For Getting Filename From User
-PARAMETERS : P_FILE TYPE RLGRAP-FILENAME.
-
-
-AT SELECTION-SCREEN ON VALUE-REQUEST FOR P_FILE.
-  CALL FUNCTION 'F4_FILENAME'
-   EXPORTING
-     FIELD_NAME          = 'P_FILE'
-   IMPORTING
-     FILE_NAME           = P_FILE.
 
 
 
 START-OF-SELECTION.
 
-CALL FUNCTION 'UPLOAD_XLS_FILE_2_ITAB'
+     perform get_data.
+     perform build_data.
+     perform display_data.
+
+end-of-SELECTION.
+
+
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM GET_DATA .
+
+  select a~EBELN a~BSART a~AEDAT a~ERNAM a~LIFNR
+         b~EBELP b~TXZ01 b~MATNR b~MENGE b~MEINS b~NETPR b~NETWR
+
+
+         from ekko as a INNER JOIN ekpo as b on a~ebeln = b~ebeln
+         into CORRESPONDING FIELDS OF TABLE GT_LIST
+         WHERE a~ebeln in s_ebeln
+           and b~ebelp in s_ebelp
+           and a~BSTYP = 'F'
+           and a~bsart in s_bsart
+           and a~aedat in s_aedat.
+
+     IF GT_LIST[] IS NOT INITIAL.
+
+  select * from lfa1 into CORRESPONDING FIELDS OF TABLE gt_lfa1
+  FOR ALL ENTRIES IN gt_list
+  WHERE lifnr = gt_list-lifnr.
+
+     ENDIF.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  BUILD_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM BUILD_DATA .
+
+    loop at gt_list into gs_list.
+    READ TABLE gt_lfa1 into gs_lfa1 with key lifnr = gs_list-lifnr.
+    gs_list-name1  = gs_lfa1-name1.
+
+*   "for row colors
+**Populate color variable with colour properties
+**Char 1 = C (This is a color property)
+**Char 2 = 3 (Color codes: 1 - 7)
+**Char 3 = Intensified on/off ( 1 or 0 )
+**Char 4 = Inverse display on/off ( 1 or 0 )
+**i.e. wa_ekko-line_color = 'C410'
+*
+*
+**    IF GS_LIST-NETWR LE '10000.00'.
+**       GS_LIST-LINE_COLOR = 'C410'.
+**    ELSEIF GS_LIST-NETWR GT '10000.00'.
+**       GS_LIST-LINE_COLOR = 'C610'.
+**    ENDIF.
+*
+*
+*    IF GS_LIST-NETWR GT '100000.00'.
+*     clear : GS_FIELD.
+*     GS_FIELD-FIELDNAME = 'TXZ01'.
+*     GS_FIELD-COLOR-COL = 6.
+*     APPEND GS_FIELD TO GS_LIST-FIELD_COLOR.
+*     GS_FIELD-FIELDNAME = 'NETWR'.
+*     GS_FIELD-COLOR-COL = 3.
+*     APPEND GS_FIELD TO GS_LIST-FIELD_COLOR.
+*    ENDIF.
+
+    IF GS_LIST-NETWR GT '100000.00'.
+    REFRESH GT_CELLSTYLE.
+    CLEAR : gs_list-CELLSTYLE, gs_cellstyle.
+
+    GS_CELLSTYLE-fieldname = 'APPROVE'.   " field1
+    GS_CELLSTYLE-style     = cl_gui_alv_grid=>MC_STYLE_DISABLED.
+    append GS_CELLSTYLE TO GT_CELLSTYLE.
+
+    GS_CELLSTYLE-fieldname = 'NETWR'.   " field1
+    GS_CELLSTYLE-style     = cl_gui_alv_grid=>MC_STYLE_DISABLED.
+    append GS_CELLSTYLE TO GT_CELLSTYLE.
+
+    GS_CELLSTYLE-fieldname = 'REMARK'.   " field1
+    GS_CELLSTYLE-style     = cl_gui_alv_grid=>MC_STYLE_DISABLED.
+    append GS_CELLSTYLE TO GT_CELLSTYLE.
+
+    gs_list-CELLSTYLE[] = GT_CELLSTYLE[].
+
+
+    ENDIF.
+
+     IF GS_LIST-NETWR LT '10000.00'.
+     gs_list-ICON1  = '@08@'.
+     ELSEIF GS_LIST-NETWR LT '50000.00'.
+     gs_list-ICON1  = '@09@'.
+     ELSE.
+     gs_list-ICON1  = '@0A@'.
+     ENDIF.
+
+     gs_list-ICON2  = '@09@'.
+     gs_list-ICON3  = '@0A@'.
+     gs_list-ICON4  = ICON_WD_RADIO_BUTTON_EMPTY.
+
+    MODIFY gt_list from gs_list. " TRANSPORTING name1.
+
+    clear : gs_list, gs_lfa1.
+    endloop.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM DISPLAY_DATA .
+
+  CLEAR : GV_CNT, GT_FCAT[], GS_FCAT.
+
+  GS_LAYOUT-CWIDTH_OPT = 'X'.
+*  GS_LAYOUT-STYLEFNAME = 'CELLSTYLE'.
+  gs_layout-INFO_FNAME = 'LINE_COLOR'.
+  gs_layout-CTAB_FNAME = 'FIELD_COLOR'.
+  GS_LAYOUT-BOX_FNAME  = 'SEL'.
+  GS_LAYOUT-STYLEFNAME = 'CELLSTYLE'.
+  GS_VARIANT-REPORT    = SY-REPID.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'EBELN'.
+  GS_FCAT-HOTSPOT   = 'X'.
+  GS_FCAT-EMPHASIZE = 'C5'.
+  GS_FCAT-COLTEXT = 'PO Number'.
+*  GS_FCAT-EMPHASIZE = 'C3'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'AEDAT'.
+  GS_FCAT-COLTEXT = 'PO Date'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'ERNAM'.
+  GS_FCAT-COLTEXT = 'ERNAM'.
+  GS_FCAT-EMPHASIZE = 'C3'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'BSART'.
+  GS_FCAT-COLTEXT = 'PO Document type'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'LIFNR'.
+  GS_FCAT-COLTEXT   = 'Vendor Code'.
+  GS_FCAT-NO_ZERO   = 'X'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'NAME1'.
+  GS_FCAT-COLTEXT   = 'Vendor Name'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'EBELP'.
+  GS_FCAT-COLTEXT   = 'Line Item'.
+  GS_FCAT-NO_ZERO   = 'X'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'TXZ01'.
+  GS_FCAT-COLTEXT   = 'Material Text'.
+  GS_FCAT-EMPHASIZE = 'C7'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'MATNR'.
+  GS_FCAT-COLTEXT   = 'Material Code'.
+  GS_FCAT-NO_ZERO   = 'X'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'MENGE'.
+  GS_FCAT-COLTEXT   = 'Quantity'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'MEINS'.
+  GS_FCAT-COLTEXT   = 'Quantity'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'MEINS'.
+  GS_FCAT-COLTEXT   = 'Quantity'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'NETWR'.
+  GS_FCAT-COLTEXT   = 'Net Price'.
+  GS_FCAT-EDIT      = 'X'.
+  GS_FCAT-REF_TABLE = 'EKPO'.
+  GS_FCAT-REF_FIELD = 'NETWR'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'APPROVE'.
+  GS_FCAT-COLTEXT   = 'Approve'.
+  GS_FCAT-CHECKBOX  = 'X'.
+  GS_FCAT-EDIT      = 'X'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'REMARK'.
+  GS_FCAT-COLTEXT   = 'Remark'.
+  GS_FCAT-EDIT      = 'X'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'ICON1'.
+  GS_FCAT-COLTEXT   = 'Icon1'.
+  GS_FCAT-ICON      = 'X'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'ICON2'.
+  GS_FCAT-COLTEXT   = 'Icon2'.
+  GS_FCAT-ICON      = 'X'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'ICON3'.
+  GS_FCAT-COLTEXT   = 'Icon3'.
+  GS_FCAT-ICON      = 'X'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+
+  GV_CNT = GV_CNT + 1.
+  GS_FCAT-COL_POS   =  GV_CNT .
+  GS_FCAT-FIELDNAME = 'ICON4'.
+  GS_FCAT-COLTEXT   = 'Icon4'.
+  GS_FCAT-ICON      = 'X'.
+  APPEND GS_FCAT TO GT_FCAT.
+  CLEAR GS_FCAT.
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY_LVC'
+    EXPORTING
+      I_CALLBACK_PROGRAM       = SY-REPID
+      I_CALLBACK_USER_COMMAND  = 'USER_COMMAND'
+      I_CALLBACK_PF_STATUS_SET = 'PF_STATUS'
+      I_CALLBACK_TOP_OF_PAGE   = 'TOP-OF-PAGE'
+*  I_CALLBACK_HTML_TOP_OF_PAGE = 'HTML_TOP_OF_PAGE'
+      IS_LAYOUT_LVC            = GS_LAYOUT
+      IT_FIELDCAT_LVC          = GT_FCAT[]
+*     I_GRID_SETTINGS          = gs_grid
+*     IT_EVENTS                = lt_evts[]
+*      IT_EVENTS          = I_EVENTS
+      I_DEFAULT                = 'X'
+      I_SAVE                   = 'A'
+      IS_VARIANT               = GS_VARIANT
+* IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER  =
+*     ES_EXIT_CAUSED_BY_USER   =
+    TABLES
+      T_OUTTAB                 = GT_LIST[]
+    EXCEPTIONS
+      PROGRAM_ERROR            = 1
+      OTHERS                   = 2.
+
+  IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+  ENDIF.
+
+
+ENDFORM.
+
+FORM PF_STATUS USING RT_EXTAB TYPE SLIS_T_EXTAB.
+*  SET PF-STATUS 'ZPF1'.
+  SET PF-STATUS 'ZSTANDARD'.
+ENDFORM.
+
+
+FORM USER_COMMAND  USING R_UCOMM LIKE SY-UCOMM
+                         RS_SELFIELD TYPE SLIS_SELFIELD.
+
+
+DATA : G_GRID_I TYPE REF TO CL_GUI_ALV_GRID.
+DATA : LV_REFRESH TYPE FLAG.
+
+  CALL FUNCTION 'GET_GLOBALS_FROM_SLVC_FULLSCR'
+*   EXPORTING
+*     IR_SALV_FULLSCREEN_ADAPTER       =
+   IMPORTING
+*     ET_EXCLUDING                     =
+*     E_REPID                          =
+*     E_CALLBACK_PROGRAM               =
+*     E_CALLBACK_ROUTINE               =
+     E_GRID                           = G_GRID_I
+*     ET_FIELDCAT_LVC                  =
+*     ER_TRACE                         =
+*     E_FLG_NO_HTML                    =
+*     ES_LAYOUT_KKBLO                  =
+*     ES_SEL_HIDE                      =
+*     ET_EVENT_EXIT                    =
+*     ER_FORM_TOL                      =
+*     ER_FORM_EOL                      =
+            .
+
+   if G_GRID_I is NOT INITIAL.
+      LV_REFRESH = 'X'.
+
+    CALL METHOD G_GRID_I->CHECK_CHANGED_DATA
+      CHANGING
+        C_REFRESH = LV_REFRESH.
+
+   endif.
+
+
+
+  CASE R_UCOMM.
+    WHEN '&IC1'.
+      READ TABLE GT_LIST INTO GS_LIST INDEX RS_SELFIELD-TABINDEX.
+*
+      if gs_list-ebeln is NOT INITIAL and RS_SELFIELD-FIELDNAME = 'EBELN'.
+
+      SET PARAMETER ID 'BES' FIELD GS_LIST-EBELN.
+      CALL TRANSACTION 'ME23N' AND SKIP FIRST SCREEN.
+*
+      elseif gs_list-ebeln is NOT INITIAL and RS_SELFIELD-FIELDNAME = 'EBELP'.
+
+      SUBMIT ZDEMO_PO_REPORT WITH S_EBELN BETWEEN  gs_list-ebeln and gs_list-ebeln
+
+
+                             with s_ebelp BETWEEN gs_list-ebelp and gs_list-ebelp
+                             AND RETURN.
+
+
+      elseif gs_list-ebeln is NOT INITIAL.
+
+       gt_list1[] = gt_list[].
+       delete gt_list1 WHERE ebeln ne gs_list-ebeln.
+
+       PERFORM display_po_item.
+
+      endif.
+
+   WHEN '&DATA_SAVE' or 'SAVE'.
+
+
+   WHEN 'BACK'.
+     set SCREEN 0.
+
+   ENDCASE.
+
+ CLEAR : SY-UCOMM.
+ENDFORM.
+
+FORM TOP-OF-PAGE.
+
+  clear : t_header[].
+
+  WRITE SY-DATUM TO TODAY_DT.
+
+  WA_HEADER-TYP  = 'H'.
+  WA_HEADER-INFO = 'Purchase Order Details'.
+  APPEND WA_HEADER TO T_HEADER.
+  CLEAR WA_HEADER.
+
+  WRITE SY-DATUM TO TODAY_DT.
+
+  WA_HEADER-TYP  = 'S'.
+  WA_HEADER-KEY = 'Report Run Date'.
+  WA_HEADER-INFO = TODAY_DT.
+  APPEND WA_HEADER TO T_HEADER.
+  CLEAR WA_HEADER.
+
+  WRITE SY-UZEIT TO TODAY_TIME.
+
+  WA_HEADER-TYP  = 'S'.
+  WA_HEADER-KEY = 'Report Run Time'.
+  WA_HEADER-INFO = TODAY_TIME.
+  APPEND WA_HEADER TO T_HEADER.
+  CLEAR WA_HEADER.
+
+*  WA_HEADER-TYP  = 'A'.
+*  WA_HEADER-KEY = 'Total PO Value'.
+*  WA_HEADER-INFO = '1234.00'.
+*  APPEND WA_HEADER TO T_HEADER.
+*  CLEAR WA_HEADER.
+
+  CALL FUNCTION 'REUSE_ALV_COMMENTARY_WRITE'
+    EXPORTING
+      IT_LIST_COMMENTARY       = T_HEADER
+     I_LOGO                   = 'SLOGO'   "'ENJOYSAP_LOGO'
+*     I_END_OF_LIST_GRID       =
+*     I_ALV_FORM               =
+            .
+
+*
+**
+*  CALL FUNCTION 'REUSE_ALV_COMMENTARY_WRITE'
+*    EXPORTING
+*      IT_LIST_COMMENTARY = T_HEADER
+*      i_logo             = 'MYLOGO'.
+**      i_logo             = 'ENJOYSAP_LOGO'.
+**I_LOGO = 'Z_LOGO'.
+
+
+
+ENDFORM.
+
+FORM HTML_TOP_OF_PAGE USING document TYPE REF TO cl_dd_document.
+
+CALL METHOD DOCUMENT->ADD_TEXT_AS_HEADING
   EXPORTING
-    I_FILENAME       = P_FILE
-  TABLES
-    E_ITAB           = GT_ITAB
- EXCEPTIONS
-   FILE_ERROR       = 1
-   OTHERS           = 2.
+    TEXT          = 'Purchase Order Details'
+*    SAP_COLOR     =
+*    SAP_FONTSTYLE =
+*    HEADING_LEVEL = 3
+*    A11Y_TOOLTIP  =
+*  CHANGING
+*    DOCUMENT      =
+    .
+
+  CALL METHOD DOCUMENT->NEW_LINE
+*    EXPORTING
+*      REPEAT =
+      .
+
+CALL METHOD DOCUMENT->ADD_TABLE
+  EXPORTING
+    NO_OF_COLUMNS               =  2
+*    WITH_HEADING                =
+*    CELL_BACKGROUND_TRANSPARENT = 'X'
+    BORDER                      = '1'
+    WIDTH                       = '40%'
+*    WITH_A11Y_MARKS             =
+*    A11Y_LABEL                  =
+  IMPORTING
+*    TABLE                       =
+    TABLEAREA                   = r_dd_table
+  EXCEPTIONS
+    TABLE_ALREADY_USED          = 1
+    OTHERS                      = 2
+        .
 IF SY-SUBRC <> 0.
 * Implement suitable error handling here
-CASE SY-SUBRC.
-  WHEN 1.
-  MESSAGE 'Something went wrong in file,Close file and upload again' TYPE 'E'.
-  WHEN 2.
-  MESSAGE 'Error in Uploading file,Try again' TYPE 'E'.
-ENDCASE.
 ENDIF.
 
-*&Reference for CL_SALV_TABLE for Displaying the Output
-DATA GR_TABLE   TYPE REF TO CL_SALV_TABLE.
+  CALL METHOD r_dd_table->new_row.
+
+CALL METHOD R_DD_TABLE->ADD_TEXT
+  EXPORTING
+    TEXT          = 'FR FC'
+*    TEXT_TABLE    =
+*    FIX_LINES     =
+*    SAP_STYLE     =
+*    SAP_COLOR     =
+*    SAP_FONTSIZE  =
+*    SAP_FONTSTYLE =
+*    SAP_EMPHASIS  =
+*    STYLE_CLASS   =
+*    A11Y_TOOLTIP  =
+*  CHANGING
+*    DOCUMENT      =
+    .
+
+CALL METHOD R_DD_TABLE->ADD_TEXT
+  EXPORTING
+    TEXT          = 'FR SC'
+*    TEXT_TABLE    =
+*    FIX_LINES     =
+*    SAP_STYLE     =
+*    SAP_COLOR     =
+*    SAP_FONTSIZE  =
+*    SAP_FONTSTYLE =
+*    SAP_EMPHASIS  =
+*    STYLE_CLASS   =
+*    A11Y_TOOLTIP  =
+*  CHANGING
+*    DOCUMENT      =
+    .
+
+  CALL METHOD R_DD_TABLE->NEW_ROW
+*    EXPORTING
+*      REPEAT =
+      .
+
+ CALL METHOD R_DD_TABLE->ADD_TEXT
+  EXPORTING
+    TEXT          = 'SR FC'
+*    TEXT_TABLE    =
+*    FIX_LINES     =
+*    SAP_STYLE     =
+*    SAP_COLOR     =
+*    SAP_FONTSIZE  =
+*    SAP_FONTSTYLE =
+*    SAP_EMPHASIS  =
+*    STYLE_CLASS   =
+*    A11Y_TOOLTIP  =
+*  CHANGING
+*    DOCUMENT      =
+    .
+
+CALL METHOD R_DD_TABLE->ADD_TEXT
+  EXPORTING
+    TEXT          = 'SR SC'
+*    TEXT_TABLE    =
+*    FIX_LINES     =
+*    SAP_STYLE     =
+*    SAP_COLOR     =
+*    SAP_FONTSIZE  =
+*    SAP_FONTSTYLE =
+*    SAP_EMPHASIS  =
+*    STYLE_CLASS   =
+*    A11Y_TOOLTIP  =
+*  CHANGING
+*    DOCUMENT      =
+    .
+
+CALL METHOD R_DD_TABLE->NEW_ROW
+*  EXPORTING
+*    REPEAT =
+    .
 
 
-CL_SALV_TABLE=>FACTORY(
-  IMPORTING
-    R_SALV_TABLE   = GR_TABLE
-  CHANGING
-    T_TABLE        = GT_ITAB ).
+*  CALL METHOD DOCUMENT->ADD_GAP
+*    EXPORTING
+*      WIDTH      = 150
+**      WIDTH_LIKE =
+*      .
+*
+*
+*CALL METHOD DOCUMENT->ADD_PICTURE
+*  EXPORTING
+*    PICTURE_ID       =  'SLOGO'
+**    WIDTH            =
+**    ALTERNATIVE_TEXT =
+**    TABINDEX         =
+*    .
+*
+*  CALL METHOD DOCUMENT->NEW_LINE
+**    EXPORTING
+**      REPEAT =
+*      .
+*
+*
+*  CALL METHOD DOCUMENT->NO_LINEBREAK
+**    EXPORTING
+**      START  =
+**      END    =
+*      .
+*
+* CALL METHOD DOCUMENT->ADD_TEXT
+*   EXPORTING
+*     TEXT          =  'Column1'
+**     TEXT_TABLE    =
+**     FIX_LINES     =
+**     SAP_STYLE     =
+**     SAP_COLOR     =
+**     SAP_FONTSIZE  =
+**     SAP_FONTSTYLE =
+**     SAP_EMPHASIS  =
+**     STYLE_CLASS   =
+**     A11Y_TOOLTIP  =
+**   CHANGING
+**     DOCUMENT      =
+*     .
+*
+*   CALL METHOD DOCUMENT->NO_LINEBREAK
+**    EXPORTING
+**      START  =
+**      END    =
+*      .
+*
+*
+* CALL METHOD DOCUMENT->ADD_TEXT
+*   EXPORTING
+*     TEXT          =  'Column2'
+**     TEXT_TABLE    =
+**     FIX_LINES     =
+**     SAP_STYLE     =
+**     SAP_COLOR     =
+**     SAP_FONTSIZE  =
+**     SAP_FONTSTYLE =
+**     SAP_EMPHASIS  =
+**     STYLE_CLASS   =
+**     A11Y_TOOLTIP  =
+**   CHANGING
+**     DOCUMENT      =
+*     .
+*
+*
+*   CALL METHOD DOCUMENT->NO_LINEBREAK
+**    EXPORTING
+**      START  =
+**      END    =
+*      .
+*
+*  CALL METHOD DOCUMENT->ADD_GAP
+*    EXPORTING
+*      WIDTH      = 40
+**      WIDTH_LIKE =
+*      .
+*
+*
+* CALL METHOD DOCUMENT->ADD_TEXT
+*   EXPORTING
+*     TEXT          =  'Column3'
+**     TEXT_TABLE    =
+**     FIX_LINES     =
+**     SAP_STYLE     =
+**     SAP_COLOR     =
+**     SAP_FONTSIZE  =
+**     SAP_FONTSTYLE =
+**     SAP_EMPHASIS  =
+**     STYLE_CLASS   =
+**     A11Y_TOOLTIP  =
+**   CHANGING
+**     DOCUMENT      =
+*     .
 
-GR_TABLE->DISPLAY( ).
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_PO_ITEM
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM DISPLAY_PO_ITEM .
+
+  CLEAR : GV_CNT1, GT_FCAT1[], GS_FCAT1.
+
+  GS_LAYOUT1-CWIDTH_OPT = 'X'.
+*  GS_LAYOUT-STYLEFNAME = 'CELLSTYLE'.
+*  gs_layout-ctab_fname = 'TCOLOR'.
+  GS_LAYOUT1-BOX_FNAME  = 'SEL'.
+  GS_VARIANT1-REPORT    = SY-REPID.
+
+  gv_cnt1 = gv_cnt1 + 1.
+  gs_fcat1-COL_POS   =  gv_cnt1 .
+  gs_fcat1-FIELDNAME = 'EBELN'.
+  gs_fcat1-COLTEXT = 'PO Number'.
+*  gs_fcat1-EMPHASIZE = 'C3'.
+  APPEND gs_fcat1 TO gt_fcat1.
+  CLEAR gs_fcat1.
+
+
+  gv_cnt1 = gv_cnt1 + 1.
+  gs_fcat1-COL_POS   =  gv_cnt1 .
+  gs_fcat1-FIELDNAME = 'EBELP'.
+  gs_fcat1-COLTEXT   = 'Line Item'.
+  gs_fcat1-NO_ZERO   = 'X'.
+  APPEND gs_fcat1 TO gt_fcat1.
+  CLEAR gs_fcat1.
+
+  gv_cnt1 = gv_cnt1 + 1.
+  gs_fcat1-COL_POS   =  gv_cnt1 .
+  gs_fcat1-FIELDNAME = 'MATNR'.
+  gs_fcat1-COLTEXT   = 'Material Code'.
+  gs_fcat1-NO_ZERO   = 'X'.
+  APPEND gs_fcat1 TO gt_fcat1.
+  CLEAR gs_fcat1.
+
+  gv_cnt1 = gv_cnt1 + 1.
+  gs_fcat1-COL_POS   =  gv_cnt1 .
+  gs_fcat1-FIELDNAME = 'TXZ01'.
+  gs_fcat1-COLTEXT   = 'Material Text'.
+  APPEND gs_fcat1 TO gt_fcat1.
+  CLEAR gs_fcat1.
+
+  gv_cnt1 = gv_cnt1 + 1.
+  gs_fcat1-COL_POS   =  gv_cnt1 .
+  gs_fcat1-FIELDNAME = 'MENGE'.
+  gs_fcat1-COLTEXT   = 'Quantity'.
+  APPEND gs_fcat1 TO gt_fcat1.
+  CLEAR gs_fcat1.
+
+  gv_cnt1 = gv_cnt1 + 1.
+  gs_fcat1-COL_POS   =  gv_cnt1 .
+  gs_fcat1-FIELDNAME = 'MEINS'.
+  gs_fcat1-COLTEXT   = 'Quantity'.
+  APPEND gs_fcat1 TO gt_fcat1.
+  CLEAR gs_fcat1.
+
+
+  gv_cnt1 = gv_cnt1 + 1.
+  gs_fcat1-COL_POS   =  gv_cnt1 .
+  gs_fcat1-FIELDNAME = 'NETWR'.
+  gs_fcat1-COLTEXT   = 'Net Price'.
+  APPEND gs_fcat1 TO gt_fcat1.
+  CLEAR gs_fcat1.
+
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY_LVC'
+    EXPORTING
+      I_CALLBACK_PROGRAM       = SY-REPID
+*      I_CALLBACK_USER_COMMAND  = 'USER_COMMAND'
+*      I_CALLBACK_PF_STATUS_SET = 'PF_STATUS'
+*      I_CALLBACK_TOP_OF_PAGE   = 'TOP-OF-PAGE'
+*  I_CALLBACK_HTML_TOP_OF_PAGE = 'HTML_TOP_OF_PAGE'
+      IS_LAYOUT_LVC            = GS_LAYOUT1
+      IT_FIELDCAT_LVC          = gt_fcat1[]
+*     I_GRID_SETTINGS          = gs_grid
+*     IT_EVENTS                = lt_evts[]
+*      IT_EVENTS          = I_EVENTS
+      I_DEFAULT                = 'X'
+      I_SAVE                   = 'A'
+      IS_VARIANT               = GS_VARIANT1
+* IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER  =
+*     ES_EXIT_CAUSED_BY_USER   =
+    TABLES
+      T_OUTTAB                 = GT_LIST1[]
+    EXCEPTIONS
+      PROGRAM_ERROR            = 1
+      OTHERS                   = 2.
+
+  IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+  ENDIF.
+
+ENDFORM.
