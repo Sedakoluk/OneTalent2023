@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>ZOT_29_CL_OOP</CLSNAME>
+    <LANGU>T</LANGU>
+    <DESCRIPT>Object Oriented Programming Class</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <LANGU>T</LANGU>
+     <DESCRIPT>CONSTRUCTOR</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>DISPLAY_ALV</CMPNAME>
+     <LANGU>T</LANGU>
+     <DESCRIPT>ALV RAPOR POP-UP</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>FETCH_DATA</CMPNAME>
+     <LANGU>T</LANGU>
+     <DESCRIPT>FETCH DATA</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_MATNR</CMPNAME>
+     <LANGU>T</LANGU>
+     <DESCRIPT>Malzeme numarası</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_WERKS</CMPNAME>
+     <LANGU>T</LANGU>
+     <DESCRIPT>Üretim yeri</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+   <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>V_MATNR</SCONAME>
+     <LANGU>T</LANGU>
+     <DESCRIPT>Malzeme numarası</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>FETCH_DATA</CMPNAME>
+     <SCONAME>GT_RETURN</SCONAME>
+     <LANGU>T</LANGU>
+     <DESCRIPT>Fetch Data Table Type</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>FETCH_DATA</CMPNAME>
+     <SCONAME>MATNR</SCONAME>
+     <LANGU>T</LANGU>
+     <DESCRIPT>Malzeme numarası</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>FETCH_DATA</CMPNAME>
+     <SCONAME>WERKS</SCONAME>
+     <LANGU>T</LANGU>
+     <DESCRIPT>Üretim yeri</DESCRIPT>
+    </SEOSUBCOTX>
+   </DESCRIPTIONS_SUB>
+  </asx:values>
+ </asx:abap>
+</abapGit>
