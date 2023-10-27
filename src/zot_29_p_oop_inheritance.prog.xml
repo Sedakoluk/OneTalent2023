@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>ZOT_29_BATCH_INPUT</NAME>
+    <NAME>ZOT_29_P_OOP_INHERITANCE</NAME>
     <SUBC>1</SUBC>
     <RLOAD>T</RLOAD>
     <FIXPT>X</FIXPT>
@@ -15,14 +15,8 @@
      <TEXTPOOL>
       <item>
        <ID>R</ID>
-       <ENTRY>Batch Input</ENTRY>
-       <LENGTH>11</LENGTH>
-      </item>
-      <item>
-       <ID>S</ID>
-       <KEY>P_MAKTX</KEY>
-       <ENTRY>Malzeme Adı Giriniz</ENTRY>
-       <LENGTH>27</LENGTH>
+       <ENTRY>oop inheritance</ENTRY>
+       <LENGTH>15</LENGTH>
       </item>
      </TEXTPOOL>
     </item>

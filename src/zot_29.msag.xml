@@ -68,6 +68,24 @@
      <MSGNR>009</MSGNR>
      <TEXT>Veri Bulunamadı!</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZOT_29</ARBGB>
+     <MSGNR>010</MSGNR>
+     <TEXT>Mail Gönderildi!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZOT_29</ARBGB>
+     <MSGNR>011</MSGNR>
+     <TEXT>Adres BCS&apos;&apos;de Hata Oluştu!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZOT_29</ARBGB>
+     <MSGNR>012</MSGNR>
+     <TEXT>Rota Bilgisi Boş!</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

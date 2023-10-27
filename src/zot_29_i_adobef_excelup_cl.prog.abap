@@ -92,7 +92,8 @@ CLASS lcl_main IMPLEMENTATION.
     LOOP AT gt_fieldcatalog ASSIGNING FIELD-SYMBOL(<fs_fcat>).
       CASE <fs_fcat>-fieldname.
         WHEN 'ROUTE'.
-          <fs_fcat>-no_out = 'X'.
+          <fs_fcat>-tech = 'X'.
+
       ENDCASE.
     ENDLOOP.
 

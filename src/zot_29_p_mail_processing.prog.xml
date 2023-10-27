@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>ZOT_29_BATCH_INPUT</NAME>
+    <NAME>ZOT_29_P_MAIL_PROCESSING</NAME>
     <SUBC>1</SUBC>
     <RLOAD>T</RLOAD>
     <FIXPT>X</FIXPT>
@@ -14,15 +14,21 @@
      <LANGUAGE>T</LANGUAGE>
      <TEXTPOOL>
       <item>
+       <ID>I</ID>
+       <KEY>001</KEY>
+       <ENTRY>Seçim Ekranı</ENTRY>
+       <LENGTH>22</LENGTH>
+      </item>
+      <item>
        <ID>R</ID>
-       <ENTRY>Batch Input</ENTRY>
-       <LENGTH>11</LENGTH>
+       <ENTRY>10TS - Mail Processing</ENTRY>
+       <LENGTH>22</LENGTH>
       </item>
       <item>
        <ID>S</ID>
-       <KEY>P_MAKTX</KEY>
-       <ENTRY>Malzeme Adı Giriniz</ENTRY>
-       <LENGTH>27</LENGTH>
+       <KEY>P_VBELN</KEY>
+       <ENTRY>Teslimat Numarası</ENTRY>
+       <LENGTH>25</LENGTH>
       </item>
      </TEXTPOOL>
     </item>

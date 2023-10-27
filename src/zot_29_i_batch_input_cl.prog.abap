@@ -43,32 +43,26 @@ CLASS lcl_main IMPLEMENTATION.
 *     UPDATE cupdate "S- verilerin kaydedilmesini bekle  A- kaydedilmesini bekleme
        MESSAGES INTO mt_messtab. "işlem bittikten sonra mesajları logladığı itab
 
-*call METHOD go_class->
-
   ENDMETHOD.
 
 
-  METHOD bdc_dynpro.
+  METHOD bdc_dynpro. "ekran numarasını alıyor
 
-*FORM bdc_dynpro USING program dynpro.   "ekran numarasını alıyor
     CLEAR ms_bdcdata.
     ms_bdcdata-program  = program.
     ms_bdcdata-dynpro   = dynpro.
     ms_bdcdata-dynbegin = 'X'.
     APPEND ms_bdcdata TO mt_bdcdata.
-*ENDFORM.
 
   ENDMETHOD.
 
 
-  METHOD bdc_field.
+  METHOD bdc_field. "value'sunu alıyo
 
-*FORM bdc_field USING fnam fval. "value'sunu alıyo
     CLEAR ms_bdcdata.
     ms_bdcdata-fnam = fnam.
     ms_bdcdata-fval = fval.
     APPEND ms_bdcdata TO mt_bdcdata.
-*ENDFORM.
 
   ENDMETHOD.
 ENDCLASS.
